@@ -1,0 +1,9 @@
+Teacher: {{ object_list.1.teacher_name }}
+Student: {{ object_list.1.student_name }}
+
+{% for obj in object_list %}
+<p>Subject:</p>
+<p>subject_id : {{ obj.subject_id }}</p>
+<p>subject_name: {{ obj.subject_name }}</p>
+<p>teacher_name: {{ obj.teacher_name }}</p>
+{% endfor %}

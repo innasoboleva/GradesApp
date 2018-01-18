@@ -1,0 +1,7 @@
+{{ object_list.1.subject_id }}
+{{ object_list.1.subject_name }}
+
+{% for obj in object_list %}
+<p>task_name: {{ obj.task_name }}</p>
+<p>task_grade: {{ obj.task_grade }}</p>
+{% endfor %}

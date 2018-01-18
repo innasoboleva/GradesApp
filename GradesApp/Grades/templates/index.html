@@ -1,0 +1,17 @@
+<!--{% for obj in object_list %}-->
+<!--<p>subject_id : {{ obj.subject_id }}</p>-->
+<!--<p>subject_name: {{ obj.subject_name }}</p>-->
+<!--<p>teacher_id: {{ obj.teacher_id }}</p>-->
+<!--<p>teacher_name: {{ obj.teacher_name }}</p>-->
+<!--<p></p>-->
+<!--<p></p>-->
+<!--{% endfor %}-->
+
+{% for obj in object_users %}
+<p>user_login : {{ obj.user_login }}</p>
+<p>user_password: {{ obj.user_password }}</p>
+
+<p>user_name: {{ obj.user_name }}</p>
+<p>user_teacher: {{ obj.user_teacher }}</p>
+<p></p>
+{% endfor %}
