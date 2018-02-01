@@ -7,46 +7,102 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9DC8E666201012F600E25FA6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DC8E665201012F600E25FA6 /* AppDelegate.swift */; };
-		9DC8E668201012F600E25FA6 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DC8E667201012F600E25FA6 /* ViewController.swift */; };
-		9DC8E66B201012F600E25FA6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9DC8E669201012F600E25FA6 /* Main.storyboard */; };
-		9DC8E66D201012F600E25FA6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9DC8E66C201012F600E25FA6 /* Assets.xcassets */; };
-		9DC8E670201012F600E25FA6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9DC8E66E201012F600E25FA6 /* LaunchScreen.storyboard */; };
-		9DC8E67B201012F600E25FA6 /* GradesIOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DC8E67A201012F600E25FA6 /* GradesIOSTests.swift */; };
+		9D2CA7242012B0C70010FA27 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA7232012B0C70010FA27 /* AppDelegate.swift */; };
+		9D2CA7262012B0C70010FA27 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA7252012B0C70010FA27 /* ViewController.swift */; };
+		9D2CA7292012B0C70010FA27 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D2CA7272012B0C70010FA27 /* Main.storyboard */; };
+		9D2CA72B2012B0C70010FA27 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9D2CA72A2012B0C70010FA27 /* Assets.xcassets */; };
+		9D2CA72E2012B0C70010FA27 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D2CA72C2012B0C70010FA27 /* LaunchScreen.storyboard */; };
+		9D2CA7392012B0C70010FA27 /* GradesIOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA7382012B0C70010FA27 /* GradesIOSTests.swift */; };
+		9D2CA7442012B0DC0010FA27 /* Teacher.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D2CA7432012B0DC0010FA27 /* Teacher.storyboard */; };
+		9D2CA7462012B2960010FA27 /* SubstTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA7452012B2960010FA27 /* SubstTableViewCell.swift */; };
+		9D2CA74A2016C0AD0010FA27 /* Subject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA7492016C0AD0010FA27 /* Subject.swift */; };
+		9D2CA74C2016C2900010FA27 /* TeacherSubjectsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA74B2016C2900010FA27 /* TeacherSubjectsTableViewController.swift */; };
+		9D2CA7522017CA0A0010FA27 /* TasksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA7512017CA0A0010FA27 /* TasksTableViewController.swift */; };
+		9D2CA7542017CA350010FA27 /* TasksTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA7532017CA350010FA27 /* TasksTableViewCell.swift */; };
+		9D2CA7562017CA670010FA27 /* StudentGradesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA7552017CA670010FA27 /* StudentGradesTableViewCell.swift */; };
+		9D2CA7582017CA8F0010FA27 /* StudentGradesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA7572017CA8F0010FA27 /* StudentGradesTableViewController.swift */; };
+		9D2CA75A2017D18D0010FA27 /* NewSubjectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA7592017D18D0010FA27 /* NewSubjectViewController.swift */; };
+		9D2CA75C2017E2CC0010FA27 /* NewTaskViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA75B2017E2CC0010FA27 /* NewTaskViewController.swift */; };
+		9D2CA75E2017E2F40010FA27 /* AddStudentsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA75D2017E2F40010FA27 /* AddStudentsTableViewController.swift */; };
+		9D2CA7602017E3180010FA27 /* AddStudentsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA75F2017E3180010FA27 /* AddStudentsTableViewCell.swift */; };
+		9D2CA7622017FE2D0010FA27 /* Student.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9D2CA7612017FE2D0010FA27 /* Student.storyboard */; };
+		9D2CA7642018000C0010FA27 /* StudentSubjectTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA7632018000C0010FA27 /* StudentSubjectTableViewCell.swift */; };
+		9D2CA766201800370010FA27 /* StudentSubjectTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA765201800370010FA27 /* StudentSubjectTableViewController.swift */; };
+		9D2CA768201800720010FA27 /* TaskGradesTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA767201800720010FA27 /* TaskGradesTableViewController.swift */; };
+		9D2CA76A201800930010FA27 /* TaskGradesTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA769201800930010FA27 /* TaskGradesTableViewCell.swift */; };
+		9D2CA76C201948410010FA27 /* EditSubjectTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA76B201948410010FA27 /* EditSubjectTableViewCell.swift */; };
+		9D2CA76E201948670010FA27 /* EditSubjectTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA76D201948670010FA27 /* EditSubjectTableViewController.swift */; };
+		9D2CA770201A8C9C0010FA27 /* EditSubjectCellProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA76F201A8C9C0010FA27 /* EditSubjectCellProtocol.swift */; };
+		9D2CA772201FDE3E0010FA27 /* EditTasksTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA771201FDE3E0010FA27 /* EditTasksTableViewController.swift */; };
+		9D2CA774201FDE580010FA27 /* EditTasksTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA773201FDE580010FA27 /* EditTasksTableViewCell.swift */; };
+		9D2CA776201FEE020010FA27 /* TasksDelegateProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA775201FEE020010FA27 /* TasksDelegateProtocol.swift */; };
+		9D2CA778202111240010FA27 /* ReturnGradeProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA777202111240010FA27 /* ReturnGradeProtocol.swift */; };
+		9D2CA77A202119650010FA27 /* GradesDelegatePropocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA779202119650010FA27 /* GradesDelegatePropocol.swift */; };
+		9D2CA77C2023AE600010FA27 /* AddRemoveStudentsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA77B2023AE600010FA27 /* AddRemoveStudentsProtocol.swift */; };
+		9D2CA77E2023B3ED0010FA27 /* StudentsChangedProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA77D2023B3ED0010FA27 /* StudentsChangedProtocol.swift */; };
+		9D2CA7802023CA600010FA27 /* NewListOfStudentsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA77F2023CA600010FA27 /* NewListOfStudentsProtocol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		9DC8E677201012F600E25FA6 /* PBXContainerItemProxy */ = {
+		9D2CA7352012B0C70010FA27 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 9DC8E65A201012F600E25FA6 /* Project object */;
+			containerPortal = 9D2CA7182012B0C70010FA27 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 9DC8E661201012F600E25FA6;
+			remoteGlobalIDString = 9D2CA71F2012B0C70010FA27;
 			remoteInfo = GradesIOS;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		9DC8E662201012F600E25FA6 /* GradesIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GradesIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		9DC8E665201012F600E25FA6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		9DC8E667201012F600E25FA6 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		9DC8E66A201012F600E25FA6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		9DC8E66C201012F600E25FA6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		9DC8E66F201012F600E25FA6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		9DC8E671201012F600E25FA6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9DC8E676201012F600E25FA6 /* GradesIOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GradesIOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		9DC8E67A201012F600E25FA6 /* GradesIOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradesIOSTests.swift; sourceTree = "<group>"; };
-		9DC8E67C201012F600E25FA6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9D2CA7202012B0C70010FA27 /* GradesIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GradesIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D2CA7232012B0C70010FA27 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		9D2CA7252012B0C70010FA27 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		9D2CA7282012B0C70010FA27 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		9D2CA72A2012B0C70010FA27 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9D2CA72D2012B0C70010FA27 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		9D2CA72F2012B0C70010FA27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9D2CA7342012B0C70010FA27 /* GradesIOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GradesIOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D2CA7382012B0C70010FA27 /* GradesIOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradesIOSTests.swift; sourceTree = "<group>"; };
+		9D2CA73A2012B0C70010FA27 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9D2CA7432012B0DC0010FA27 /* Teacher.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Teacher.storyboard; sourceTree = "<group>"; };
+		9D2CA7452012B2960010FA27 /* SubstTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubstTableViewCell.swift; sourceTree = "<group>"; };
+		9D2CA7492016C0AD0010FA27 /* Subject.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subject.swift; sourceTree = "<group>"; };
+		9D2CA74B2016C2900010FA27 /* TeacherSubjectsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeacherSubjectsTableViewController.swift; sourceTree = "<group>"; };
+		9D2CA7512017CA0A0010FA27 /* TasksTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksTableViewController.swift; sourceTree = "<group>"; };
+		9D2CA7532017CA350010FA27 /* TasksTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksTableViewCell.swift; sourceTree = "<group>"; };
+		9D2CA7552017CA670010FA27 /* StudentGradesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentGradesTableViewCell.swift; sourceTree = "<group>"; };
+		9D2CA7572017CA8F0010FA27 /* StudentGradesTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentGradesTableViewController.swift; sourceTree = "<group>"; };
+		9D2CA7592017D18D0010FA27 /* NewSubjectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSubjectViewController.swift; sourceTree = "<group>"; };
+		9D2CA75B2017E2CC0010FA27 /* NewTaskViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewTaskViewController.swift; sourceTree = "<group>"; };
+		9D2CA75D2017E2F40010FA27 /* AddStudentsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStudentsTableViewController.swift; sourceTree = "<group>"; };
+		9D2CA75F2017E3180010FA27 /* AddStudentsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddStudentsTableViewCell.swift; sourceTree = "<group>"; };
+		9D2CA7612017FE2D0010FA27 /* Student.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Student.storyboard; sourceTree = "<group>"; };
+		9D2CA7632018000C0010FA27 /* StudentSubjectTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentSubjectTableViewCell.swift; sourceTree = "<group>"; };
+		9D2CA765201800370010FA27 /* StudentSubjectTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentSubjectTableViewController.swift; sourceTree = "<group>"; };
+		9D2CA767201800720010FA27 /* TaskGradesTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskGradesTableViewController.swift; sourceTree = "<group>"; };
+		9D2CA769201800930010FA27 /* TaskGradesTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskGradesTableViewCell.swift; sourceTree = "<group>"; };
+		9D2CA76B201948410010FA27 /* EditSubjectTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditSubjectTableViewCell.swift; sourceTree = "<group>"; };
+		9D2CA76D201948670010FA27 /* EditSubjectTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditSubjectTableViewController.swift; sourceTree = "<group>"; };
+		9D2CA76F201A8C9C0010FA27 /* EditSubjectCellProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditSubjectCellProtocol.swift; sourceTree = "<group>"; };
+		9D2CA771201FDE3E0010FA27 /* EditTasksTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTasksTableViewController.swift; sourceTree = "<group>"; };
+		9D2CA773201FDE580010FA27 /* EditTasksTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTasksTableViewCell.swift; sourceTree = "<group>"; };
+		9D2CA775201FEE020010FA27 /* TasksDelegateProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TasksDelegateProtocol.swift; sourceTree = "<group>"; };
+		9D2CA777202111240010FA27 /* ReturnGradeProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReturnGradeProtocol.swift; sourceTree = "<group>"; };
+		9D2CA779202119650010FA27 /* GradesDelegatePropocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradesDelegatePropocol.swift; sourceTree = "<group>"; };
+		9D2CA77B2023AE600010FA27 /* AddRemoveStudentsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRemoveStudentsProtocol.swift; sourceTree = "<group>"; };
+		9D2CA77D2023B3ED0010FA27 /* StudentsChangedProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentsChangedProtocol.swift; sourceTree = "<group>"; };
+		9D2CA77F2023CA600010FA27 /* NewListOfStudentsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewListOfStudentsProtocol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		9DC8E65F201012F600E25FA6 /* Frameworks */ = {
+		9D2CA71D2012B0C70010FA27 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9DC8E673201012F600E25FA6 /* Frameworks */ = {
+		9D2CA7312012B0C70010FA27 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -56,56 +112,100 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		9DC8E659201012F600E25FA6 = {
+		9D2CA7172012B0C70010FA27 = {
 			isa = PBXGroup;
 			children = (
-				9DC8E664201012F600E25FA6 /* GradesIOS */,
-				9DC8E679201012F600E25FA6 /* GradesIOSTests */,
-				9DC8E663201012F600E25FA6 /* Products */,
+				9D2CA7222012B0C70010FA27 /* GradesIOS */,
+				9D2CA7372012B0C70010FA27 /* GradesIOSTests */,
+				9D2CA7212012B0C70010FA27 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		9DC8E663201012F600E25FA6 /* Products */ = {
+		9D2CA7212012B0C70010FA27 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				9DC8E662201012F600E25FA6 /* GradesIOS.app */,
-				9DC8E676201012F600E25FA6 /* GradesIOSTests.xctest */,
+				9D2CA7202012B0C70010FA27 /* GradesIOS.app */,
+				9D2CA7342012B0C70010FA27 /* GradesIOSTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		9DC8E664201012F600E25FA6 /* GradesIOS */ = {
+		9D2CA7222012B0C70010FA27 /* GradesIOS */ = {
 			isa = PBXGroup;
 			children = (
-				9DC8E665201012F600E25FA6 /* AppDelegate.swift */,
-				9DC8E667201012F600E25FA6 /* ViewController.swift */,
-				9DC8E669201012F600E25FA6 /* Main.storyboard */,
-				9DC8E66C201012F600E25FA6 /* Assets.xcassets */,
-				9DC8E66E201012F600E25FA6 /* LaunchScreen.storyboard */,
-				9DC8E671201012F600E25FA6 /* Info.plist */,
+				9D2CA7822023D1300010FA27 /* Student */,
+				9D2CA7812023D10E0010FA27 /* Protocols */,
+				9D2CA7232012B0C70010FA27 /* AppDelegate.swift */,
+				9D2CA7252012B0C70010FA27 /* ViewController.swift */,
+				9D2CA7272012B0C70010FA27 /* Main.storyboard */,
+				9D2CA7432012B0DC0010FA27 /* Teacher.storyboard */,
+				9D2CA771201FDE3E0010FA27 /* EditTasksTableViewController.swift */,
+				9D2CA773201FDE580010FA27 /* EditTasksTableViewCell.swift */,
+				9D2CA76D201948670010FA27 /* EditSubjectTableViewController.swift */,
+				9D2CA76B201948410010FA27 /* EditSubjectTableViewCell.swift */,
+				9D2CA7612017FE2D0010FA27 /* Student.storyboard */,
+				9D2CA75F2017E3180010FA27 /* AddStudentsTableViewCell.swift */,
+				9D2CA75D2017E2F40010FA27 /* AddStudentsTableViewController.swift */,
+				9D2CA75B2017E2CC0010FA27 /* NewTaskViewController.swift */,
+				9D2CA7572017CA8F0010FA27 /* StudentGradesTableViewController.swift */,
+				9D2CA7552017CA670010FA27 /* StudentGradesTableViewCell.swift */,
+				9D2CA7532017CA350010FA27 /* TasksTableViewCell.swift */,
+				9D2CA7592017D18D0010FA27 /* NewSubjectViewController.swift */,
+				9D2CA7512017CA0A0010FA27 /* TasksTableViewController.swift */,
+				9D2CA74B2016C2900010FA27 /* TeacherSubjectsTableViewController.swift */,
+				9D2CA7452012B2960010FA27 /* SubstTableViewCell.swift */,
+				9D2CA7492016C0AD0010FA27 /* Subject.swift */,
+				9D2CA72A2012B0C70010FA27 /* Assets.xcassets */,
+				9D2CA72C2012B0C70010FA27 /* LaunchScreen.storyboard */,
+				9D2CA72F2012B0C70010FA27 /* Info.plist */,
 			);
 			path = GradesIOS;
 			sourceTree = "<group>";
 		};
-		9DC8E679201012F600E25FA6 /* GradesIOSTests */ = {
+		9D2CA7372012B0C70010FA27 /* GradesIOSTests */ = {
 			isa = PBXGroup;
 			children = (
-				9DC8E67A201012F600E25FA6 /* GradesIOSTests.swift */,
-				9DC8E67C201012F600E25FA6 /* Info.plist */,
+				9D2CA7382012B0C70010FA27 /* GradesIOSTests.swift */,
+				9D2CA73A2012B0C70010FA27 /* Info.plist */,
 			);
 			path = GradesIOSTests;
+			sourceTree = "<group>";
+		};
+		9D2CA7812023D10E0010FA27 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				9D2CA775201FEE020010FA27 /* TasksDelegateProtocol.swift */,
+				9D2CA76F201A8C9C0010FA27 /* EditSubjectCellProtocol.swift */,
+				9D2CA77D2023B3ED0010FA27 /* StudentsChangedProtocol.swift */,
+				9D2CA77F2023CA600010FA27 /* NewListOfStudentsProtocol.swift */,
+				9D2CA77B2023AE600010FA27 /* AddRemoveStudentsProtocol.swift */,
+				9D2CA777202111240010FA27 /* ReturnGradeProtocol.swift */,
+				9D2CA779202119650010FA27 /* GradesDelegatePropocol.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
+		9D2CA7822023D1300010FA27 /* Student */ = {
+			isa = PBXGroup;
+			children = (
+				9D2CA765201800370010FA27 /* StudentSubjectTableViewController.swift */,
+				9D2CA7632018000C0010FA27 /* StudentSubjectTableViewCell.swift */,
+				9D2CA767201800720010FA27 /* TaskGradesTableViewController.swift */,
+				9D2CA769201800930010FA27 /* TaskGradesTableViewCell.swift */,
+			);
+			path = Student;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		9DC8E661201012F600E25FA6 /* GradesIOS */ = {
+		9D2CA71F2012B0C70010FA27 /* GradesIOS */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9DC8E67F201012F600E25FA6 /* Build configuration list for PBXNativeTarget "GradesIOS" */;
+			buildConfigurationList = 9D2CA73D2012B0C70010FA27 /* Build configuration list for PBXNativeTarget "GradesIOS" */;
 			buildPhases = (
-				9DC8E65E201012F600E25FA6 /* Sources */,
-				9DC8E65F201012F600E25FA6 /* Frameworks */,
-				9DC8E660201012F600E25FA6 /* Resources */,
+				9D2CA71C2012B0C70010FA27 /* Sources */,
+				9D2CA71D2012B0C70010FA27 /* Frameworks */,
+				9D2CA71E2012B0C70010FA27 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -113,49 +213,49 @@
 			);
 			name = GradesIOS;
 			productName = GradesIOS;
-			productReference = 9DC8E662201012F600E25FA6 /* GradesIOS.app */;
+			productReference = 9D2CA7202012B0C70010FA27 /* GradesIOS.app */;
 			productType = "com.apple.product-type.application";
 		};
-		9DC8E675201012F600E25FA6 /* GradesIOSTests */ = {
+		9D2CA7332012B0C70010FA27 /* GradesIOSTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 9DC8E682201012F600E25FA6 /* Build configuration list for PBXNativeTarget "GradesIOSTests" */;
+			buildConfigurationList = 9D2CA7402012B0C70010FA27 /* Build configuration list for PBXNativeTarget "GradesIOSTests" */;
 			buildPhases = (
-				9DC8E672201012F600E25FA6 /* Sources */,
-				9DC8E673201012F600E25FA6 /* Frameworks */,
-				9DC8E674201012F600E25FA6 /* Resources */,
+				9D2CA7302012B0C70010FA27 /* Sources */,
+				9D2CA7312012B0C70010FA27 /* Frameworks */,
+				9D2CA7322012B0C70010FA27 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				9DC8E678201012F600E25FA6 /* PBXTargetDependency */,
+				9D2CA7362012B0C70010FA27 /* PBXTargetDependency */,
 			);
 			name = GradesIOSTests;
 			productName = GradesIOSTests;
-			productReference = 9DC8E676201012F600E25FA6 /* GradesIOSTests.xctest */;
+			productReference = 9D2CA7342012B0C70010FA27 /* GradesIOSTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		9DC8E65A201012F600E25FA6 /* Project object */ = {
+		9D2CA7182012B0C70010FA27 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0920;
 				LastUpgradeCheck = 0920;
 				ORGANIZATIONNAME = "Inna Soboleva";
 				TargetAttributes = {
-					9DC8E661201012F600E25FA6 = {
+					9D2CA71F2012B0C70010FA27 = {
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
 					};
-					9DC8E675201012F600E25FA6 = {
+					9D2CA7332012B0C70010FA27 = {
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
-						TestTargetID = 9DC8E661201012F600E25FA6;
+						TestTargetID = 9D2CA71F2012B0C70010FA27;
 					};
 				};
 			};
-			buildConfigurationList = 9DC8E65D201012F600E25FA6 /* Build configuration list for PBXProject "GradesIOS" */;
+			buildConfigurationList = 9D2CA71B2012B0C70010FA27 /* Build configuration list for PBXProject "GradesIOS" */;
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -163,29 +263,31 @@
 				en,
 				Base,
 			);
-			mainGroup = 9DC8E659201012F600E25FA6;
-			productRefGroup = 9DC8E663201012F600E25FA6 /* Products */;
+			mainGroup = 9D2CA7172012B0C70010FA27;
+			productRefGroup = 9D2CA7212012B0C70010FA27 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				9DC8E661201012F600E25FA6 /* GradesIOS */,
-				9DC8E675201012F600E25FA6 /* GradesIOSTests */,
+				9D2CA71F2012B0C70010FA27 /* GradesIOS */,
+				9D2CA7332012B0C70010FA27 /* GradesIOSTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		9DC8E660201012F600E25FA6 /* Resources */ = {
+		9D2CA71E2012B0C70010FA27 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9DC8E670201012F600E25FA6 /* LaunchScreen.storyboard in Resources */,
-				9DC8E66D201012F600E25FA6 /* Assets.xcassets in Resources */,
-				9DC8E66B201012F600E25FA6 /* Main.storyboard in Resources */,
+				9D2CA72E2012B0C70010FA27 /* LaunchScreen.storyboard in Resources */,
+				9D2CA7442012B0DC0010FA27 /* Teacher.storyboard in Resources */,
+				9D2CA72B2012B0C70010FA27 /* Assets.xcassets in Resources */,
+				9D2CA7292012B0C70010FA27 /* Main.storyboard in Resources */,
+				9D2CA7622017FE2D0010FA27 /* Student.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9DC8E674201012F600E25FA6 /* Resources */ = {
+		9D2CA7322012B0C70010FA27 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -195,46 +297,72 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		9DC8E65E201012F600E25FA6 /* Sources */ = {
+		9D2CA71C2012B0C70010FA27 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9DC8E668201012F600E25FA6 /* ViewController.swift in Sources */,
-				9DC8E666201012F600E25FA6 /* AppDelegate.swift in Sources */,
+				9D2CA774201FDE580010FA27 /* EditTasksTableViewCell.swift in Sources */,
+				9D2CA778202111240010FA27 /* ReturnGradeProtocol.swift in Sources */,
+				9D2CA7262012B0C70010FA27 /* ViewController.swift in Sources */,
+				9D2CA7582017CA8F0010FA27 /* StudentGradesTableViewController.swift in Sources */,
+				9D2CA776201FEE020010FA27 /* TasksDelegateProtocol.swift in Sources */,
+				9D2CA7642018000C0010FA27 /* StudentSubjectTableViewCell.swift in Sources */,
+				9D2CA7562017CA670010FA27 /* StudentGradesTableViewCell.swift in Sources */,
+				9D2CA75C2017E2CC0010FA27 /* NewTaskViewController.swift in Sources */,
+				9D2CA7542017CA350010FA27 /* TasksTableViewCell.swift in Sources */,
+				9D2CA74A2016C0AD0010FA27 /* Subject.swift in Sources */,
+				9D2CA7462012B2960010FA27 /* SubstTableViewCell.swift in Sources */,
+				9D2CA76C201948410010FA27 /* EditSubjectTableViewCell.swift in Sources */,
+				9D2CA7242012B0C70010FA27 /* AppDelegate.swift in Sources */,
+				9D2CA7802023CA600010FA27 /* NewListOfStudentsProtocol.swift in Sources */,
+				9D2CA7602017E3180010FA27 /* AddStudentsTableViewCell.swift in Sources */,
+				9D2CA7522017CA0A0010FA27 /* TasksTableViewController.swift in Sources */,
+				9D2CA772201FDE3E0010FA27 /* EditTasksTableViewController.swift in Sources */,
+				9D2CA76A201800930010FA27 /* TaskGradesTableViewCell.swift in Sources */,
+				9D2CA77E2023B3ED0010FA27 /* StudentsChangedProtocol.swift in Sources */,
+				9D2CA75E2017E2F40010FA27 /* AddStudentsTableViewController.swift in Sources */,
+				9D2CA75A2017D18D0010FA27 /* NewSubjectViewController.swift in Sources */,
+				9D2CA74C2016C2900010FA27 /* TeacherSubjectsTableViewController.swift in Sources */,
+				9D2CA770201A8C9C0010FA27 /* EditSubjectCellProtocol.swift in Sources */,
+				9D2CA76E201948670010FA27 /* EditSubjectTableViewController.swift in Sources */,
+				9D2CA768201800720010FA27 /* TaskGradesTableViewController.swift in Sources */,
+				9D2CA766201800370010FA27 /* StudentSubjectTableViewController.swift in Sources */,
+				9D2CA77A202119650010FA27 /* GradesDelegatePropocol.swift in Sources */,
+				9D2CA77C2023AE600010FA27 /* AddRemoveStudentsProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		9DC8E672201012F600E25FA6 /* Sources */ = {
+		9D2CA7302012B0C70010FA27 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9DC8E67B201012F600E25FA6 /* GradesIOSTests.swift in Sources */,
+				9D2CA7392012B0C70010FA27 /* GradesIOSTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		9DC8E678201012F600E25FA6 /* PBXTargetDependency */ = {
+		9D2CA7362012B0C70010FA27 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 9DC8E661201012F600E25FA6 /* GradesIOS */;
-			targetProxy = 9DC8E677201012F600E25FA6 /* PBXContainerItemProxy */;
+			target = 9D2CA71F2012B0C70010FA27 /* GradesIOS */;
+			targetProxy = 9D2CA7352012B0C70010FA27 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		9DC8E669201012F600E25FA6 /* Main.storyboard */ = {
+		9D2CA7272012B0C70010FA27 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9DC8E66A201012F600E25FA6 /* Base */,
+				9D2CA7282012B0C70010FA27 /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
-		9DC8E66E201012F600E25FA6 /* LaunchScreen.storyboard */ = {
+		9D2CA72C2012B0C70010FA27 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
-				9DC8E66F201012F600E25FA6 /* Base */,
+				9D2CA72D2012B0C70010FA27 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -242,7 +370,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		9DC8E67D201012F600E25FA6 /* Debug */ = {
+		9D2CA73B2012B0C70010FA27 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -299,7 +427,7 @@
 			};
 			name = Debug;
 		};
-		9DC8E67E201012F600E25FA6 /* Release */ = {
+		9D2CA73C2012B0C70010FA27 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -349,7 +477,7 @@
 			};
 			name = Release;
 		};
-		9DC8E680201012F600E25FA6 /* Debug */ = {
+		9D2CA73E2012B0C70010FA27 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -364,7 +492,7 @@
 			};
 			name = Debug;
 		};
-		9DC8E681201012F600E25FA6 /* Release */ = {
+		9D2CA73F2012B0C70010FA27 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -379,7 +507,7 @@
 			};
 			name = Release;
 		};
-		9DC8E683201012F600E25FA6 /* Debug */ = {
+		9D2CA7412012B0C70010FA27 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
@@ -396,7 +524,7 @@
 			};
 			name = Debug;
 		};
-		9DC8E684201012F600E25FA6 /* Release */ = {
+		9D2CA7422012B0C70010FA27 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
@@ -416,34 +544,34 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		9DC8E65D201012F600E25FA6 /* Build configuration list for PBXProject "GradesIOS" */ = {
+		9D2CA71B2012B0C70010FA27 /* Build configuration list for PBXProject "GradesIOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				9DC8E67D201012F600E25FA6 /* Debug */,
-				9DC8E67E201012F600E25FA6 /* Release */,
+				9D2CA73B2012B0C70010FA27 /* Debug */,
+				9D2CA73C2012B0C70010FA27 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9DC8E67F201012F600E25FA6 /* Build configuration list for PBXNativeTarget "GradesIOS" */ = {
+		9D2CA73D2012B0C70010FA27 /* Build configuration list for PBXNativeTarget "GradesIOS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				9DC8E680201012F600E25FA6 /* Debug */,
-				9DC8E681201012F600E25FA6 /* Release */,
+				9D2CA73E2012B0C70010FA27 /* Debug */,
+				9D2CA73F2012B0C70010FA27 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		9DC8E682201012F600E25FA6 /* Build configuration list for PBXNativeTarget "GradesIOSTests" */ = {
+		9D2CA7402012B0C70010FA27 /* Build configuration list for PBXNativeTarget "GradesIOSTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				9DC8E683201012F600E25FA6 /* Debug */,
-				9DC8E684201012F600E25FA6 /* Release */,
+				9D2CA7412012B0C70010FA27 /* Debug */,
+				9D2CA7422012B0C70010FA27 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 9DC8E65A201012F600E25FA6 /* Project object */;
+	rootObject = 9D2CA7182012B0C70010FA27 /* Project object */;
 }
