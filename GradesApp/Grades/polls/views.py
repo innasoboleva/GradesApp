@@ -1,5 +1,3 @@
-from django.shortcuts import render
-
 # Create your views here.
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import Permission
@@ -342,14 +340,16 @@ def login(request):
                     break
             if teacher:
                 data_subjects = {}
+                data_task = {}
+
                 subjects = Subjects.objects.filter(teacher_id=entry.id)
                 for subject in subjects:
                     data_subjects[subject.subject_id] = subject.subject_name
+                    tasks = Tasks.objects.filter(subject_id=subject.subject_id)
+                    data_task[subject.subject_id] = {}
 
-                data_task = {}
-                tasks = Student_Grade.objects.filter(teacher_id=entry.id)
-                for task in tasks:
-                    data_task[task.subject_id] = (task.task_name)
+                    for task in tasks:
+                        data_task[subject.subject_id][task.id] = task.task_name
 
 
                 data = {}
@@ -369,8 +369,11 @@ def login(request):
                 for person in all_students:
                     data_all_students[person.id] = (person.first_name, person.last_name)
 
-                return JsonResponse({'status': 'ok', 'token': tok.key, 'data_subjects': data_subjects,
-                                     'data_task': data_task, 'all_data': data, 'all_students': data_all_students})
+                return JsonResponse({'status': 'ok', 'is_teacher': 'true', 'token': tok.key,
+                                     'data_subjects': data_subjects,
+                                     'data_task': data_task,
+                                     'all_data': data,
+                                     'all_students': data_all_students})
 
             else:
                 data_subject_student = {}
@@ -383,9 +386,9 @@ def login(request):
                     tasks = Student_Grade.objects.filter(subject_id=each_one.subject_id)
                     data_task_student[each_one.subject_id] = {}
                     for each in tasks:
-                        data_task_student[each.subject_id][each.task_name] = each.task_grade
+                        data_task_student[each_one.subject_id][each.task_name] = each.task_grade
 
-                return JsonResponse({'status': 'ok', 'token': tok.key,
+                return JsonResponse({'status': 'ok', 'token': tok.key, 'is_teacher': 'false',
                                      'data_subject_student': data_subject_student,
                                      'data_task_student': data_task_student})
     return JsonResponse({'status': 'false', 'message': 'execution did not start'}, status=404)

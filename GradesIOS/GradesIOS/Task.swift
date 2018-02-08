@@ -1,14 +1,14 @@
 //
-//  Subject.swift
+//  Task.swift
 //  GradesIOS
 //
-//  Created by Inna Soboleva on 1/22/18.
+//  Created by Inna Soboleva on 2/8/18.
 //  Copyright © 2018 Inna Soboleva. All rights reserved.
 //
 
 import UIKit
 
-class Subject: Hashable {
+class Task: Hashable {
     //MARK: Properties
     var uid: Int
     var name: String
@@ -28,9 +28,8 @@ class Subject: Hashable {
     }
 }
 
-extension Subject: Equatable {
-    static func == (lhs: Subject, rhs: Subject) -> Bool {
+extension Task: Equatable {
+    static func == (lhs: Task, rhs: Task) -> Bool {
         return lhs.name == rhs.name
     }
 }
-

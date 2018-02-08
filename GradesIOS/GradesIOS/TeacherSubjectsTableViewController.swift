@@ -19,19 +19,27 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
     }
     
     // MARK: initial data
-    var data_subjects = ["Astronomy", "Data Science", "Math", "Education", "Physics"]
-    var data_tasks = [["Planets", "Mercury", "Asteroids"],["Programming"], ["Logarithm", "Squares"], [],["Laws of nature"]]
-    var data_students = [["Anna","Maria","Inna"],
-                    ["Alex"],
-                    ["Alex", "Inna"],
-                    ["James", "Jacob"],
-                    ["Inna","Alex"]]
-    var all_students = ["Inna", "Alex", "Maria", "Tony", "Carla", "Jamie", "Anna", "James", "Jacob"]
+    let data_subjects =  [String: String]()
+    let data_tasks =  [String: [String: String]]()
+    let all_data = [String: [String: (String, String)]]()
+    let all_students = [String: (String, String)]()
+    
+//    var data_subjects = ["Astronomy", "Data Science", "Math", "Education", "Physics"]
+//    var data_tasks = [["Planets", "Mercury", "Asteroids"],["Programming"], ["Logarithm", "Squares"], [],["Laws of nature"]]
+//    var data_students = [["Anna","Maria","Inna"],
+//                    ["Alex"],
+//                    ["Alex", "Inna"],
+//                    ["James", "Jacob"],
+//                    ["Inna","Alex"]]
+//    var all_students = ["Inna", "Alex", "Maria", "Tony", "Carla", "Jamie", "Anna", "James", "Jacob"]
+    
     var students_grades = [[[Int]]]()
     
-    var subjects = [Subject]()
-    var tasks = [[Subject]]()
-    var students = [[Subject]]()
+    var subjects = [Int: Subject]()
+    var tasks = [Subject: [Int: Task]]()
+//    var students = [[Subject]]()
+    
+    var dict = [Subject: [Task: (Subject, Int)]]()
     
     // MARK: properties
     @IBOutlet weak var editButton: UIBarButtonItem!
@@ -54,52 +62,24 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
     
     //MARK: Private Methods
     
-    private func loadSampleSubjects() {
-        for i in data_subjects {
-            if let new_subject = Subject(name: i) {
-                self.subjects.append(new_subject)
-            } else {
-                fatalError("Unable to instantiate Subject " + "name: \(i)")
+    private func loadData() {
+        
+        let subject_keys = data_subjects.keys
+        for key in subject_keys {
+            let key_int = Int(key)
+            let new_subject = Subject(uid: key_int!, name: data_subjects[key]!)
+            self.subjects[key_int!] = new_subject
+            // new_subject is each subject in dict
+            let tasks_keys = data_tasks[key]?.keys
+            for task_key in tasks_keys! {
+                let int_key_task = Int(task_key)
+                let new_task = Task(uid: int_key_task!, name: data_tasks[key]![task_key]!)
+                
+                tasks[new_subject!][int_key_task!] = new_task
             }
         }
-        var counter = -1
-        for i in data_tasks {
-            counter += 1
-            self.tasks.append([])
-            for y in i {
-                if let new_task = Subject(name: y) {
-                    self.tasks[counter].append(new_task)
-                } else {
-                    fatalError("Unable to instantiate Task " + "name: \(i)")
-                }
-            }
-        }
-        counter = -1
-        for i in data_students {
-            counter += 1
-            self.students.append([])
-            for y in i {
-                if let new_student = Subject(name: y) {
-                    self.students[counter].append(new_student)
-                } else {
-                    fatalError("Unable to instantiate Student " + "name: \(i)")
-                }
-            }
-        }
-        counter = -1
-        var extra_counter = -1
-        for _ in data_subjects {
-            counter += 1
-            self.students_grades.append([])
-            for _ in data_tasks[counter] {
-                extra_counter += 1
-                self.students_grades[counter].append([])
-                for _ in data_students[counter] {
-                    students_grades[counter][extra_counter].append(0)
-                }
-            }
-            extra_counter = -1
-        }
+        
+        
     }
     
     // MARK: segues information transfer
@@ -136,7 +116,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
         tableView.delegate = self
         
         // Load the sample data.
-        loadSampleSubjects()
+        loadData()
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false

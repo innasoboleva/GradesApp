@@ -41,6 +41,9 @@
 		9D2CA77C2023AE600010FA27 /* AddRemoveStudentsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA77B2023AE600010FA27 /* AddRemoveStudentsProtocol.swift */; };
 		9D2CA77E2023B3ED0010FA27 /* StudentsChangedProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA77D2023B3ED0010FA27 /* StudentsChangedProtocol.swift */; };
 		9D2CA7802023CA600010FA27 /* NewListOfStudentsProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D2CA77F2023CA600010FA27 /* NewListOfStudentsProtocol.swift */; };
+		9D99E8FC202BE0C300A96DD8 /* RegisterTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D99E8FB202BE0C300A96DD8 /* RegisterTableViewController.swift */; };
+		9D99E8FE202D187C00A96DD8 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D99E8FD202D187C00A96DD8 /* Task.swift */; };
+		9D99E900202D1A2900A96DD8 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D99E8FF202D1A2900A96DD8 /* User.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,6 +95,9 @@
 		9D2CA77B2023AE600010FA27 /* AddRemoveStudentsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRemoveStudentsProtocol.swift; sourceTree = "<group>"; };
 		9D2CA77D2023B3ED0010FA27 /* StudentsChangedProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StudentsChangedProtocol.swift; sourceTree = "<group>"; };
 		9D2CA77F2023CA600010FA27 /* NewListOfStudentsProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewListOfStudentsProtocol.swift; sourceTree = "<group>"; };
+		9D99E8FB202BE0C300A96DD8 /* RegisterTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterTableViewController.swift; sourceTree = "<group>"; };
+		9D99E8FD202D187C00A96DD8 /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		9D99E8FF202D1A2900A96DD8 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +144,7 @@
 				9D2CA7232012B0C70010FA27 /* AppDelegate.swift */,
 				9D2CA7252012B0C70010FA27 /* ViewController.swift */,
 				9D2CA7272012B0C70010FA27 /* Main.storyboard */,
+				9D99E8FB202BE0C300A96DD8 /* RegisterTableViewController.swift */,
 				9D2CA7432012B0DC0010FA27 /* Teacher.storyboard */,
 				9D2CA771201FDE3E0010FA27 /* EditTasksTableViewController.swift */,
 				9D2CA773201FDE580010FA27 /* EditTasksTableViewCell.swift */,
@@ -154,6 +161,8 @@
 				9D2CA7512017CA0A0010FA27 /* TasksTableViewController.swift */,
 				9D2CA74B2016C2900010FA27 /* TeacherSubjectsTableViewController.swift */,
 				9D2CA7452012B2960010FA27 /* SubstTableViewCell.swift */,
+				9D99E8FD202D187C00A96DD8 /* Task.swift */,
+				9D99E8FF202D1A2900A96DD8 /* User.swift */,
 				9D2CA7492016C0AD0010FA27 /* Subject.swift */,
 				9D2CA72A2012B0C70010FA27 /* Assets.xcassets */,
 				9D2CA72C2012B0C70010FA27 /* LaunchScreen.storyboard */,
@@ -305,6 +314,7 @@
 				9D2CA778202111240010FA27 /* ReturnGradeProtocol.swift in Sources */,
 				9D2CA7262012B0C70010FA27 /* ViewController.swift in Sources */,
 				9D2CA7582017CA8F0010FA27 /* StudentGradesTableViewController.swift in Sources */,
+				9D99E900202D1A2900A96DD8 /* User.swift in Sources */,
 				9D2CA776201FEE020010FA27 /* TasksDelegateProtocol.swift in Sources */,
 				9D2CA7642018000C0010FA27 /* StudentSubjectTableViewCell.swift in Sources */,
 				9D2CA7562017CA670010FA27 /* StudentGradesTableViewCell.swift in Sources */,
@@ -322,6 +332,8 @@
 				9D2CA77E2023B3ED0010FA27 /* StudentsChangedProtocol.swift in Sources */,
 				9D2CA75E2017E2F40010FA27 /* AddStudentsTableViewController.swift in Sources */,
 				9D2CA75A2017D18D0010FA27 /* NewSubjectViewController.swift in Sources */,
+				9D99E8FC202BE0C300A96DD8 /* RegisterTableViewController.swift in Sources */,
+				9D99E8FE202D187C00A96DD8 /* Task.swift in Sources */,
 				9D2CA74C2016C2900010FA27 /* TeacherSubjectsTableViewController.swift in Sources */,
 				9D2CA770201A8C9C0010FA27 /* EditSubjectCellProtocol.swift in Sources */,
 				9D2CA76E201948670010FA27 /* EditSubjectTableViewController.swift in Sources */,
