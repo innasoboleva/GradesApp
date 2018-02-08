@@ -9,7 +9,7 @@
 import UIKit
 
 class TasksTableViewController: UITableViewController, StudentsChanged {
-    
+    // protocol StudentsChanged
     func studentsChanged(_ students: [Subject], list_added: Set<Int>,list_removed: Set<Int>) {
         
         var counter = 0
@@ -28,7 +28,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
         self.student_to_show = students
     }
     
-    
+    // MARK: properties
     weak var delegate: TeacherSubjectsTableViewController?
     
     var tasks_to_view = [Subject]()
@@ -38,6 +38,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
     
     var cell = Int()
     
+    //MARK: Actions
     
     @IBAction func unwindToTasksList(sender: UIStoryboardSegue) {
         if let sourceViewController = sender.source as? NewTaskViewController, let newsubject = sourceViewController.task {
@@ -56,9 +57,6 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
         }
         else if let sourceViewController = sender.source as? StudentGradesTableViewController {
             self.grades[sourceViewController.indexTask] = sourceViewController.grades
-//        } else if let sourceViewController = sender.source as? AddStudentsTableViewController {
-//
-//
         }
     }
 
@@ -99,7 +97,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
-       // loadSampleSubjects()
+
     }
     
     override func viewWillDisappear(_ animated: Bool) {

@@ -10,10 +10,11 @@ import UIKit
 
 class EditSubjectTableViewCell: UITableViewCell, UITextFieldDelegate {
     
+    // MARK: properties
+    @IBOutlet weak var subjectText: UITextField!
+    
     weak var delegating: EditSubjectTableViewController?
     var indexNum = Int()
-
-    @IBOutlet weak var subjectText: UITextField!
     
     override func awakeFromNib() {
         super.awakeFromNib()

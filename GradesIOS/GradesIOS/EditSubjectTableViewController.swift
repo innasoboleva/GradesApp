@@ -10,6 +10,13 @@ import UIKit
 import os.log
 
 class EditSubjectTableViewController: UITableViewController, EditSubjectCellProtocol {
+    // protocol EditSubjectCellProtocol
+    func changeCell(_ cell: UITableViewCell, atIndex: Int, name: String) {
+        let newIndexPath = IndexPath(row: atIndex, section: 0)
+        let newSubject = Subject(name: name)
+        listOfSubjects[atIndex] = newSubject!
+        tableView.reloadRows(at: [newIndexPath], with: .automatic)
+    }
     
     // MARK: properties
     var listOfSubjects = [Subject]()
@@ -21,14 +28,7 @@ class EditSubjectTableViewController: UITableViewController, EditSubjectCellProt
         dismiss(animated: true, completion: nil)
     }
     
-    // protocol
-    func changeCell(_ cell: UITableViewCell, atIndex: Int, name: String) {
-        let newIndexPath = IndexPath(row: atIndex, section: 0)
-        let newSubject = Subject(name: name)
-        listOfSubjects[atIndex] = newSubject!
-        tableView.reloadRows(at: [newIndexPath], with: .automatic)
-    }
-    
+    // navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
         

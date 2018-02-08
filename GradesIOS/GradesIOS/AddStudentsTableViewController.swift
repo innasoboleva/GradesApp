@@ -10,9 +10,7 @@ import UIKit
 
 class AddStudentsTableViewController: UITableViewController, AddRemoveStudents {
     
-    weak var delegate: TasksTableViewController?
- //   weak var delegating: StudentGradesTableViewController?
-    
+    // protocol AddRemoveStudents
     func addStudent(name: String) {
         let new_student = Subject(name: name)
         subject_students.append(new_student!)
@@ -26,15 +24,25 @@ class AddStudentsTableViewController: UITableViewController, AddRemoveStudents {
         subject_students.remove(at: indexOfPerson!)
         let indexOfName = all_students.index(of: name)
         list_of_removed_students.insert(indexOfName!)
-        
     }
     
-    
+    // MARK: properties
+    weak var delegate: TasksTableViewController?
     var all_students = [String]()
     var students = [Subject]()
     var subject_students = [Subject]()
     var list_of_added_students = Set<Int>()
     var list_of_removed_students = Set<Int>()
+    
+    // MARK: private methods
+    private func loadSampleSubjects() {
+        for i in all_students {
+            guard let student = Subject(name: i) else {
+                fatalError("Unable to instantiate Student named: "+"\(i)")
+            }
+            students.append(student)
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -97,16 +105,7 @@ class AddStudentsTableViewController: UITableViewController, AddRemoveStudents {
     }
  
 
-    // MARK: private methods
     
-    private func loadSampleSubjects() {
-        for i in all_students {
-            guard let student = Subject(name: i) else {
-                fatalError("Unable to instantiate Student named: "+"\(i)")
-            }
-            students.append(student)
-        }
-    }
     
     
     /*

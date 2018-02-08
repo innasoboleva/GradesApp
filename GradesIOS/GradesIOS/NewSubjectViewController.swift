@@ -13,20 +13,11 @@ class NewSubjectViewController: UIViewController, UITextFieldDelegate {
     // MARK: properties
     
     @IBOutlet weak var saveButton: UIButton!
-    
     @IBOutlet weak var newSubjectName: UITextField!
-    /*
-     This value is either passed by `NewSubjectViewController` in `prepare(for:sender:)`
-     or constructed as part of adding a new subject.
-     */
+    
     var subject: Subject?
     
-    // MARK: actions
-    
-    
     // MARK: navigation
-    
-    
     @IBAction func cancel(_ sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
     }
@@ -45,17 +36,6 @@ class NewSubjectViewController: UIViewController, UITextFieldDelegate {
         let name = newSubjectName.text ?? ""
         subject = Subject(name: name)
     }
-    
-    //MARK: UITextFieldDelegate
-//    func textFieldDidBeginEditing(_ textField: UITextField) {
-//        // Disable the Save button while editing.
-//        saveButton.isEnabled = false
-//    }
-//    
-//    func textFieldDidEndEditing(_ textField: UITextField) {
-//        updateSaveButtonState()
-//        navigationItem.title = textField.text
-//    }
     
     override func viewDidLoad() {
         super.viewDidLoad()

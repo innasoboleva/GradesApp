@@ -9,6 +9,9 @@
 import UIKit
 
 class TaskGradesTableViewController: UITableViewController {
+    
+    var tasks_to_show = [String]()
+    var grades = [String]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,23 +32,28 @@ class TaskGradesTableViewController: UITableViewController {
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return tasks_to_show.count
     }
 
-    /*
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
+        
+        let cellIdentifier = "TaskGradesTableViewCell"
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? TaskGradesTableViewCell else {
+            fatalError("The dequeued cell is not an instance of TaskGradesTableViewCell.")
+        }
+        // Fetches the appropriate subject for the data source layout.
+        cell.taskName.text = tasks_to_show[indexPath.row]
+        cell.grade.text = grades[indexPath.row]
+        
         return cell
     }
-    */
+ 
 
     /*
     // Override to support conditional editing of the table view.

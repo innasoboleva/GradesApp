@@ -45,9 +45,7 @@
                             <outlet property="delegate" destination="Vey-8s-ctL" id="Kio-3W-NPA"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="5l5-8u-ESQ">
-                        <barButtonItem key="rightBarButtonItem" systemItem="edit" id="xmb-KU-o2N"/>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" id="5l5-8u-ESQ"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0DI-dh-cjI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

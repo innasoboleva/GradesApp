@@ -16,11 +16,7 @@ class EditTasksTableViewCell: UITableViewCell, UITextFieldDelegate {
     
     @IBOutlet weak var taskName: UITextField!
     
-    // MARK: actions
-//    @IBAction func didFinishEditingCell(_ sender: UITextField) {
-//
-//    }
-    
+    // MARK: actions    
     @IBAction func didEditCell(_ sender: UITextField) {
         self.delegating?.changeCell(self, atIndex: indexNum, name: taskName.text!)
     }

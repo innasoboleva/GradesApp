@@ -10,7 +10,23 @@ import UIKit
 
 class StudentSubjectTableViewController: UITableViewController {
     
+    // initial data
+    var subjects = ["Astronomy", "Math", "Pysics", "Astrology", "Literature"]
+    var tasks = [["Stars", "Asteroids", "Meteors"], ["Logarithm"], ["One"], ["Two"], ["Three"]]
+    var grades = [["A", "B", "C"], ["A"],["A"], ["B"], ["B"]]
     
+    // navigation
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        super.prepare(for: segue, sender: sender)
+        
+        if let toViewController = segue.destination as? TaskGradesTableViewController {
+            toViewController.tasks_to_show = tasks[tableView.indexPathForSelectedRow!.row]
+            toViewController.grades = grades[tableView.indexPathForSelectedRow!.row]
+        } else {
+            fatalError("Unable to send data to Tasks view")
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,23 +47,27 @@ class StudentSubjectTableViewController: UITableViewController {
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 0
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return 0
+        return subjects.count
     }
 
-    /*
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
-
-        // Configure the cell...
-
+        
+        let cellIdentifier = "StudentSubjectTableViewCell"
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? StudentSubjectTableViewCell else {
+            fatalError("The dequeued cell is not an instance of StudentSubjectTableViewCell.")
+        }
+        // Fetches the appropriate subject for the data source layout.
+        cell.subjectName.text = subjects[indexPath.row]
+        
         return cell
     }
-    */
+    
 
     /*
     // Override to support conditional editing of the table view.

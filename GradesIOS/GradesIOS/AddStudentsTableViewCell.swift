@@ -10,12 +10,12 @@ import UIKit
 
 class AddStudentsTableViewCell: UITableViewCell {
     
-    weak var delegating: AddStudentsTableViewController?
-    
     // MARK: properties
     @IBOutlet weak var studentName: UILabel!
     @IBOutlet weak var buttonAdd: UIButton!
+    weak var delegating: AddStudentsTableViewController?
     
+    // MARK: actions
     @IBAction func addRemoveStudent(_ sender: Any) {
         if buttonAdd.titleLabel?.text == "Add" {
             buttonAdd.setTitle("Remove", for: UIControlState.normal)

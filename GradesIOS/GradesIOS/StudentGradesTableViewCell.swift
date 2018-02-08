@@ -10,11 +10,25 @@ import UIKit
 
 class StudentGradesTableViewCell: UITableViewCell, UIPickerViewDataSource, UIPickerViewDelegate {
    
+    // MARK: propeties
+    
+    @IBOutlet weak var studentName: UILabel!
+    @IBOutlet weak var studentGrade: UIPickerView!
+    
+    weak var delegating: StudentGradesTableViewController?
+    
+    var index = Int()
     let grades = [" ", "A","B","C","D","E"]
     var current_grade = Int()
     
-    weak var delegating: StudentGradesTableViewController?
-    var index = Int()
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        // Initialization code
+        studentGrade.dataSource = self
+        studentGrade.delegate = self
+        
+    }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         return 1
@@ -32,20 +46,6 @@ class StudentGradesTableViewCell: UITableViewCell, UIPickerViewDataSource, UIPic
         self.delegating?.getGrade(row, atIndex: self.index)
     }
     
-
-    // MARK: properties
-    @IBOutlet weak var studentName: UILabel!
-    @IBOutlet weak var studentGrade: UIPickerView!
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-        studentGrade.dataSource = self
-        studentGrade.delegate = self
-        
-   //     studentGrade.selectRow(self.current_grade, inComponent: 0, animated: false)
-        
-    }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)

@@ -10,17 +10,7 @@ import UIKit
 import os.log
 
 class EditTasksTableViewController: UITableViewController, EditSubjectCellProtocol {
-    // MARK: properties
-    var list_of_tasks = [Subject]()
-    var old_list_of_tasks = [Subject]()
-    
-    @IBOutlet weak var saveButton: UIBarButtonItem!
-    
-    // MARK: actions
-    @IBAction func cancel(_ sender: UIBarButtonItem) {
-        dismiss(animated: true, completion: nil)
-    }
-    // protocol method
+    // protocol EditSubjectCellProtocol
     func changeCell(_ cell: UITableViewCell, atIndex: Int, name: String) {
         let newIndexPath = IndexPath(row: atIndex, section: 0)
         let new_task = Subject(name: name)
@@ -28,6 +18,18 @@ class EditTasksTableViewController: UITableViewController, EditSubjectCellProtoc
         tableView.reloadRows(at: [newIndexPath], with: .automatic)
     }
     
+    // MARK: properties
+    @IBOutlet weak var saveButton: UIBarButtonItem!
+    
+    var list_of_tasks = [Subject]()
+    var old_list_of_tasks = [Subject]()
+    
+    // MARK: actions
+    @IBAction func cancel(_ sender: UIBarButtonItem) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    // navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
         

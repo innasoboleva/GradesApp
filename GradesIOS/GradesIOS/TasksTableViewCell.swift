@@ -9,7 +9,7 @@
 import UIKit
 
 class TasksTableViewCell: UITableViewCell {
-
+    // MARK: propeties
     @IBOutlet weak var taskName: UILabel!
     
     override func awakeFromNib() {

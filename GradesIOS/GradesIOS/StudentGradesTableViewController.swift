@@ -11,24 +11,40 @@ import os.log
 
 class StudentGradesTableViewController: UITableViewController, ReturnGrade  {
     
-    // protocol NewListOfSudents
-//    func newStudents(_ students: [Subject]) {
-//        self.students = students
-//    }
-    
     // protocol ReturnGrade
     func getGrade(_ grade: Int, atIndex: Int) {
         self.grades[atIndex] = grade
     }
     
-    weak var delegating: TasksTableViewController?
-    
+    // MARK: properties
     @IBOutlet weak var saveButton: UIBarButtonItem!
+    
+    weak var delegating: TasksTableViewController?
     
     var students = [Subject]()
     var all_students = [String]()
     var grades = [Int]()
     var indexTask = Int()
+    
+    // navigation 
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        super.prepare(for: segue, sender: sender)
+        
+        if segue.identifier == "AddStudents" {
+            if let navigationController = segue.destination as? UINavigationController,
+                let editSubjectController = navigationController.topViewController as? AddStudentsTableViewController {
+                editSubjectController.all_students = self.all_students
+                editSubjectController.subject_students = self.students
+                editSubjectController.delegate = delegating
+            } else {
+                fatalError("Unable to send data to Tasks view")
+            }
+        }
+        guard let button = sender as? UIBarButtonItem, button === saveButton else {
+            os_log("The save button was not pressed, cancelling", log: OSLog.default, type: .debug)
+            return
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -77,24 +93,7 @@ class StudentGradesTableViewController: UITableViewController, ReturnGrade  {
         return cell
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        super.prepare(for: segue, sender: sender)
-        
-        if segue.identifier == "AddStudents" {
-            if let navigationController = segue.destination as? UINavigationController,
-                let editSubjectController = navigationController.topViewController as? AddStudentsTableViewController {
-                editSubjectController.all_students = self.all_students
-                editSubjectController.subject_students = self.students
-                editSubjectController.delegate = delegating
-            } else {
-                fatalError("Unable to send data to Tasks view")
-            }
-        }
-        guard let button = sender as? UIBarButtonItem, button === saveButton else {
-            os_log("The save button was not pressed, cancelling", log: OSLog.default, type: .debug)
-            return
-        }
-    }
+    
     
 
     /*
