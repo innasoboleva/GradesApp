@@ -19,27 +19,17 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
     }
     
     // MARK: initial data
+    var raw_token: String?
     let data_subjects =  [String: String]()
     let data_tasks =  [String: [String: String]]()
-    let all_data = [String: [String: (String, String)]]()
-    let all_students = [String: (String, String)]()
+    let all_data = [String: [String: [[String]]]]()
+    let all_students_data = [String: (String, String)]()
     
-//    var data_subjects = ["Astronomy", "Data Science", "Math", "Education", "Physics"]
-//    var data_tasks = [["Planets", "Mercury", "Asteroids"],["Programming"], ["Logarithm", "Squares"], [],["Laws of nature"]]
-//    var data_students = [["Anna","Maria","Inna"],
-//                    ["Alex"],
-//                    ["Alex", "Inna"],
-//                    ["James", "Jacob"],
-//                    ["Inna","Alex"]]
-//    var all_students = ["Inna", "Alex", "Maria", "Tony", "Carla", "Jamie", "Anna", "James", "Jacob"]
-    
-    var students_grades = [[[Int]]]()
-    
-    var subjects = [Int: Subject]()
-    var tasks = [Subject: [Int: Task]]()
-//    var students = [[Subject]]()
-    
-    var dict = [Subject: [Task: (Subject, Int)]]()
+    // for easier view controller access to it's cells
+    var subjects = [Subject]()
+    var tasks = [Subject: [Task]]()
+    var all_students = [User]()
+    var dict = [Subject: [Task: [User: Int]]]()
     
     // MARK: properties
     @IBOutlet weak var editButton: UIBarButtonItem!
@@ -51,11 +41,20 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
             // Add a new subject.
             let newIndexPath = IndexPath(row: subjects.count, section: 0)
             subjects.append(newsubject)
-            tasks.append([])
-            students.append([])
             tableView.insertRows(at: [newIndexPath], with: .automatic)
         } else if let sourceViewController = sender.source as? EditSubjectTableViewController {
-            self.subjects = sourceViewController.listOfSubjects
+            var counter = 0
+            for each_subject in sourceViewController.list_of_subjects {
+                if each_subject != self.subjects[counter] {
+                    // for keeping Dict instance up to date with the changes
+                    if let value_dict = dict.removeValue(forKey: subjects[counter]) {
+                        self.dict[each_subject] = value_dict
+                    }
+                    // keeping cells up to date
+                    self.subjects[counter] = each_subject
+                }
+                counter += 1
+            }
             tableView.reloadData()
         }
     }
@@ -68,15 +67,30 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
         for key in subject_keys {
             let key_int = Int(key)
             let new_subject = Subject(uid: key_int!, name: data_subjects[key]!)
-            self.subjects[key_int!] = new_subject
+            self.subjects.append(new_subject!)
             // new_subject is each subject in dict
             let tasks_keys = data_tasks[key]?.keys
             for task_key in tasks_keys! {
                 let int_key_task = Int(task_key)
                 let new_task = Task(uid: int_key_task!, name: data_tasks[key]![task_key]!)
                 
-                tasks[new_subject!][int_key_task!] = new_task
+                tasks[new_subject!]!.append(new_task!)
+                
+                for each_student in all_data[key]![task_key]!
+                { // each_student[0] - id, each_student[1] - name, each_student[2] - grade
+                    let new_grade = Int(each_student[3])
+                    let new_user = User(uid: Int(each_student[0])!, name: each_student[1])
+                    dict[new_subject!]![new_task!]![new_user!] = new_grade
+                }
             }
+        }
+        
+        let students_keys = all_students_data.keys
+        for key in students_keys {
+            let new_id = Int(key)
+            let (first, last) = all_students_data[key]!
+            let new_student = User(uid: new_id!, name: "\(first) \(last)")
+            all_students.append(new_student!)
         }
         
         
@@ -89,23 +103,25 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
         
         if segue.identifier == "ShowDetailsSegue" {
             if let toViewController = segue.destination as? TasksTableViewController {
-                toViewController.tasks_to_view = tasks[tableView.indexPathForSelectedRow!.row]
-                toViewController.student_to_show = students[tableView.indexPathForSelectedRow!.row]
-                toViewController.grades = students_grades[tableView.indexPathForSelectedRow!.row]
+                toViewController.dict_tasks = dict[subjects[tableView.indexPathForSelectedRow!.row]]!
+                toViewController.subject = subjects[tableView.indexPathForSelectedRow!.row]
                 toViewController.all_students = self.all_students
+                toViewController.tasks = tasks[subjects[tableView.indexPathForSelectedRow!.row]]!
+
+                toViewController.raw_token = self.raw_token
                 toViewController.cell = tableView.indexPathForSelectedRow!.row
                 toViewController.delegate = self
         } else {
-            fatalError("Unable to send data to Tasks view")
+            fatalError("Unable to send data to Tasks view controller")
             }
         }
         
         else if segue.identifier == "EditSubjectSegue" {
             if let navigationController = segue.destination as? UINavigationController,
                 let editSubjectController = navigationController.topViewController as? EditSubjectTableViewController {
-                editSubjectController.listOfSubjects = self.subjects
+                    editSubjectController.list_of_subjects = self.subjects
             } else {
-                fatalError("Unable to send data to EditSubjectTableViewController view")
+                fatalError("Unable to send data to EditSubjectTableViewController")
             }
         }
     }
@@ -114,8 +130,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
         super.viewDidLoad()
         
         tableView.delegate = self
-        
-        // Load the sample data.
+
         loadData()
         
         // Uncomment the following line to preserve selection between presentations

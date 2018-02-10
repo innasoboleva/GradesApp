@@ -291,7 +291,7 @@ def add_new_task(request):
                 entry = Tasks.objects(subject_id=subject_id, subject_name=subject_name,
                                                 teacher_id=user.id, teacher_name=user.last_name, task_name=new_task)
                 entry.save()
-                return JsonResponse({'status': 'ok'})
+                return JsonResponse({'status': 'ok', 'task_id': entry.id})
             else:
                 JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
         except:
@@ -318,7 +318,7 @@ def add_new_subject(request):
                 entry = Subjects.objects(subject_id=id, subject_name=new_subject,
                                                 teacher_id=user.id, teacher_name=user.last_name)
                 entry.save()
-                return JsonResponse({'status': 'ok'})
+                return JsonResponse({'status': 'ok', 'subject_id': entry.subject_id})
             else:
                 JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
         except:
@@ -357,7 +357,9 @@ def login(request):
                     each_task = Student_Grade.objects.filter(subject_id=some.subject_id)
                     data[some.subject_id] = {}
                     for line in each_task:
-                        data[some.subject_id][line.task_name] = (line.student_name, line.task_grade)
+                        data[some.subject_id][line.task_name] = []
+                        data[some.subject_id][line.task_name].append([line.student_id,
+                                                                      line.student_name, line.task_grade])
 
                 # data_students = {}
                 # for task in tasks:

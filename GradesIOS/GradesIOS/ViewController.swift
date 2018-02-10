@@ -13,7 +13,6 @@ class ViewController: UIViewController {
     // MARK: properties
     @IBOutlet weak var loginText: UITextField!
     @IBOutlet weak var passwordText: UITextField!
-    var token = "JWT "
     var raw_token: String?
     
     // MARK: actions
@@ -87,7 +86,7 @@ class ViewController: UIViewController {
                     
                     let data_subjects = responseJSON["data_subjects"] as! [String: String]
                     let data_tasks = responseJSON["data_task"] as! [String: [String]]
-                    let all_data = responseJSON["all_data"] as! [String: [String: (String, String)]]
+                    let all_data = responseJSON["all_data"] as! [String: [String: [String]]]
                     let all_students = responseJSON["all_students"] as! [String: (String, String)]
                     
                 }

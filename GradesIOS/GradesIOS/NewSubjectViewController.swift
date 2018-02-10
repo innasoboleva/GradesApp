@@ -15,6 +15,7 @@ class NewSubjectViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var saveButton: UIButton!
     @IBOutlet weak var newSubjectName: UITextField!
     
+    var raw_token: String?
     var subject: Subject?
     
     // MARK: navigation
@@ -34,7 +35,35 @@ class NewSubjectViewController: UIViewController, UITextFieldDelegate {
         }
         
         let name = newSubjectName.text ?? ""
-        subject = Subject(name: name)
+        if newSubjectName.text != nil {
+            
+            let json: [String: Any] = ["subject": name]
+            let jsonData = try? JSONSerialization.data(withJSONObject: json)
+            // post request to add new subject to database
+            let url = URL(string: "http://127.0.0.1:8000/polls/add_new_subject/")!
+            var request = URLRequest(url: url)
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
+            request.httpMethod = "POST"
+            request.httpBody = jsonData
+            
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                guard let data = data, error == nil else {
+                    print(error?.localizedDescription ?? "No data")
+                    return
+                }
+                let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                if let responseJSON = responseJSON as? [String: Any] {
+                    
+                    if responseJSON["status"] as? String == "ok" {
+                        let subject_id = responseJSON["subject_id"] as? String
+                        let id = Int(subject_id!)
+                        self.subject = Subject(uid: id!, name: name)
+                    }
+                }
+            }
+            task.resume()
+        }
     }
     
     override func viewDidLoad() {

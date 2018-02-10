@@ -31,24 +31,38 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
     // MARK: properties
     weak var delegate: TeacherSubjectsTableViewController?
     
-    var tasks_to_view = [Subject]()
-    var student_to_show = [Subject]()
-    var all_students = [String]()
-    var grades = [[Int]]()
+    var subject: Subject?
+    var all_students = [User]()
+    var tasks = [Task]()
+    var dict_tasks = [Task: [User: Int]]()
+    var raw_token: String?
+    
+//    var tasks_to_view = [Subject]()
+//    var student_to_show = [Subject]()
+//    var all_students = [String]()
+//    var grades = [[Int]]()
     
     var cell = Int()
     
     //MARK: Actions
     
     @IBAction func unwindToTasksList(sender: UIStoryboardSegue) {
-        if let sourceViewController = sender.source as? NewTaskViewController, let newsubject = sourceViewController.task {
-            // Add a new task.
-            let newIndexPath = IndexPath(row: tasks_to_view.count, section: 0)
-            tasks_to_view.append(newsubject)
-            grades.append([])
-            for _ in student_to_show {
-                self.grades[grades.count - 1].append(0)
+        if let sourceViewController = sender.source as? NewTaskViewController,
+            let new_task = sourceViewController.task {
+            // Add a new task
+            let newIndexPath = IndexPath(row: tasks.count, section: 0)
+            
+            if tasks.count > 0 {
+                // keeping students data up to date
+                let last_task = tasks[tasks.count - 1]
+                dict_tasks[new_task] = dict_tasks[last_task]
+                let dict_keys = dict_tasks[new_task]?.keys
+                // setiing grades for a new task to 0
+                for each_user in dict_keys! {
+                    dict_tasks[new_task]?[each_user] = 0
+                }
             }
+            tasks.append(new_task)
             tableView.insertRows(at: [newIndexPath], with: .automatic)
         } 
         else if let sourceViewController = sender.source as? EditTasksTableViewController {
@@ -75,15 +89,23 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                 toViewController.delegating = self
                 
             } else {
-                fatalError("Unable to send data to Tasks view")
+                fatalError("Unable to send data to Student Grades Controller")
             }
         }
         else if segue.identifier == "EditTasksSegue" {
             if let navigationController = segue.destination as? UINavigationController,
                 let editSubjectController = navigationController.topViewController as? EditTasksTableViewController {
-                editSubjectController.list_of_tasks = self.tasks_to_view
+                    editSubjectController.list_of_tasks = self.tasks_to_view
             } else {
-                fatalError("Unable to send data to EditSubjectTableViewController view")
+                fatalError("Unable to send data to EditTasksTableViewController")
+            }
+        }
+        else if segue.identifier == "NewTaskSegue" {
+            if let navigationController = segue.destination as? UINavigationController,
+                let newTaskController = navigationController.topViewController as? NewTaskViewController {
+                    newTaskController.raw_token = self.raw_token
+            } else {
+                fatalError("Unable to send data to NewTaskViewController")
             }
         }
     }
@@ -119,7 +141,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return tasks_to_view.count
+        return tasks.count
     }
 
     
@@ -131,7 +153,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
             fatalError("The dequeued cell is not an instance of TasksTableViewCell.")
         }
         // Fetches the appropriate task for the data source layout.
-        let task = tasks_to_view[indexPath.row]
+        let task = tasks[indexPath.row]
         
         cell.taskName.text = task.name
 

@@ -13,13 +13,13 @@ class EditSubjectTableViewController: UITableViewController, EditSubjectCellProt
     // protocol EditSubjectCellProtocol
     func changeCell(_ cell: UITableViewCell, atIndex: Int, name: String) {
         let newIndexPath = IndexPath(row: atIndex, section: 0)
-        let newSubject = Subject(name: name)
-        listOfSubjects[atIndex] = newSubject!
+        let newSubject = Subject(uid: list_of_subjects[atIndex].uid, name: name)
+        list_of_subjects[atIndex] = newSubject!
         tableView.reloadRows(at: [newIndexPath], with: .automatic)
     }
     
     // MARK: properties
-    var listOfSubjects = [Subject]()
+    var list_of_subjects = [Subject]()
     
     @IBOutlet weak var saveButton: UIBarButtonItem!
     
@@ -64,7 +64,7 @@ class EditSubjectTableViewController: UITableViewController, EditSubjectCellProt
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return listOfSubjects.count
+        return list_of_subjects.count
     }
     
     
@@ -79,7 +79,7 @@ class EditSubjectTableViewController: UITableViewController, EditSubjectCellProt
         }
         
         // Fetches the appropriate subject for the data source layout.
-        let subject = listOfSubjects[indexPath.row]
+        let subject = list_of_subjects[indexPath.row]
         
         cell.subjectText.text = subject.name
         cell.delegating = self

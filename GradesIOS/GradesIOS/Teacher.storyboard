@@ -192,7 +192,7 @@
                             <items>
                                 <barButtonItem systemItem="add" id="eAH-5q-kcm">
                                     <connections>
-                                        <segue destination="MU2-KM-IE5" kind="show" id="gen-XH-ado"/>
+                                        <segue destination="MU2-KM-IE5" kind="show" identifier="NewTaskSegue" id="gen-XH-ado"/>
                                     </connections>
                                 </barButtonItem>
                                 <barButtonItem systemItem="flexibleSpace" id="LEG-Rj-FH1"/>
