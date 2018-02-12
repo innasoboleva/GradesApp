@@ -8,5 +8,5 @@
 
 import UIKit
 protocol StudentsChanged {
-    func studentsChanged(_ students: [Subject], list_added: Set<Int>, list_removed: Set<Int>)
+    func studentsChanged(list_added: Set<User>, list_removed: Set<User>)
 }

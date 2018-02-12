@@ -10,7 +10,7 @@ import UIKit
 
 protocol AddRemoveStudents {
     
-    func addStudent (name: String)
-    func deleteStudent (name: String)
+    func addStudent (index: Int)
+    func deleteStudent (index: Int)
     
 }

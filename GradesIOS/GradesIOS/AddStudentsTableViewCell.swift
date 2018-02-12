@@ -14,15 +14,16 @@ class AddStudentsTableViewCell: UITableViewCell {
     @IBOutlet weak var studentName: UILabel!
     @IBOutlet weak var buttonAdd: UIButton!
     weak var delegating: AddStudentsTableViewController?
+    var atIndex = Int()
     
     // MARK: actions
     @IBAction func addRemoveStudent(_ sender: Any) {
         if buttonAdd.titleLabel?.text == "Add" {
             buttonAdd.setTitle("Remove", for: UIControlState.normal)
-            self.delegating?.addStudent(name: studentName.text!)
+            self.delegating?.addStudent(index: atIndex)
         } else {
             buttonAdd.setTitle("Add", for: UIControlState.normal)
-            self.delegating?.deleteStudent(name: studentName.text!)
+            self.delegating?.deleteStudent(index: atIndex)
         }
     }
     

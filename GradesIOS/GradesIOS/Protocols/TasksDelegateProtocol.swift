@@ -10,7 +10,7 @@ import UIKit
 
 protocol TasksDelegate {
     
-    func tasksChanged (_ newTasks: [Subject], new_students: [Subject], new_grades: [[Int]], atRow: Int)
+    func tasksChanged (_ newTasks: [Task: [User: Int]], tasks: [Task], atSubject: Subject)
     
 }
 

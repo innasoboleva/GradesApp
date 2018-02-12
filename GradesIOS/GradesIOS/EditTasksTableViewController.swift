@@ -13,7 +13,7 @@ class EditTasksTableViewController: UITableViewController, EditSubjectCellProtoc
     // protocol EditSubjectCellProtocol
     func changeCell(_ cell: UITableViewCell, atIndex: Int, name: String) {
         let newIndexPath = IndexPath(row: atIndex, section: 0)
-        let new_task = Subject(name: name)
+        let new_task = Task(uid: list_of_tasks[atIndex].uid, name: name)
         list_of_tasks[atIndex] = new_task!
         tableView.reloadRows(at: [newIndexPath], with: .automatic)
     }
@@ -21,8 +21,8 @@ class EditTasksTableViewController: UITableViewController, EditSubjectCellProtoc
     // MARK: properties
     @IBOutlet weak var saveButton: UIBarButtonItem!
     
-    var list_of_tasks = [Subject]()
-    var old_list_of_tasks = [Subject]()
+    var list_of_tasks = [Task]()
+ 
     
     // MARK: actions
     @IBAction func cancel(_ sender: UIBarButtonItem) {
@@ -43,7 +43,6 @@ class EditTasksTableViewController: UITableViewController, EditSubjectCellProtoc
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        old_list_of_tasks = list_of_tasks
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false

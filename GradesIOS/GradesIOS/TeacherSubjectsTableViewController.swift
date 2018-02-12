@@ -10,12 +10,10 @@ import UIKit
 import os.log
 
 class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
-    
     // protocol to set data TasksDelegate
-    func tasksChanged(_ newTasks: [Subject], new_students:[Subject], new_grades: [[Int]], atRow: Int) {
-        self.tasks[atRow] = newTasks
-        self.students_grades[atRow] = new_grades
-        self.students[atRow] = new_students
+    func tasksChanged(_ newTasks: [Task: [User: Int]], tasks: [Task], atSubject: Subject) {
+        dict[atSubject] = newTasks
+        self.tasks[atSubject] = tasks
     }
     
     // MARK: initial data
@@ -46,12 +44,42 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
             var counter = 0
             for each_subject in sourceViewController.list_of_subjects {
                 if each_subject != self.subjects[counter] {
-                    // for keeping Dict instance up to date with the changes
-                    if let value_dict = dict.removeValue(forKey: subjects[counter]) {
-                        self.dict[each_subject] = value_dict
+                    
+                    // for keeping database correct
+                    let json: [String: Any] = ["subject_id": String(describing: self.subjects[counter].uid), "subject_name": each_subject.name]
+                    let jsonData = try? JSONSerialization.data(withJSONObject: json)
+                    // post request to add new subject to database
+                    let url = URL(string: "http://127.0.0.1:8000/polls/change_subject/")!
+                    var request = URLRequest(url: url)
+                    request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                    request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
+                    request.httpMethod = "POST"
+                    request.httpBody = jsonData
+                    
+                    let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                        guard let data = data, error == nil else {
+                            print(error?.localizedDescription ?? "No data")
+                            return
+                        }
+                        let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                        if let responseJSON = responseJSON as? [String: Any] {
+                            
+                            if responseJSON["status"] as? String == "ok" {
+                                
+                                // for keeping Dict instance up to date with the changes
+                                if let value_dict = self.dict.removeValue(forKey: self.subjects[counter]) {
+                                    self.dict[each_subject] = value_dict
+                                }
+                                // keeping cells up to date
+                                self.subjects[counter] = each_subject
+                                
+                            } else {
+                                // Unable to change subject
+                                print(error?.localizedDescription ?? "Unable to change subject name in a database")
+                            }
+                        }
                     }
-                    // keeping cells up to date
-                    self.subjects[counter] = each_subject
+                    task.resume()
                 }
                 counter += 1
             }
@@ -109,7 +137,6 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                 toViewController.tasks = tasks[subjects[tableView.indexPathForSelectedRow!.row]]!
 
                 toViewController.raw_token = self.raw_token
-                toViewController.cell = tableView.indexPathForSelectedRow!.row
                 toViewController.delegate = self
         } else {
             fatalError("Unable to send data to Tasks view controller")

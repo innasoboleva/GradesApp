@@ -18,4 +18,10 @@ urlpatterns = [
     path('load_tasks/', views.load_tasks, name='load_tasks'),
     path('load_students_grades/', views.load_students_grades, name='load_students_grades'),
 
+    path('change_task/', views.change_task, name='change_task'),
+    path('change_subject/', views.change_subject, name='change_subject'),
+    path('change_grade/', views.change_grade, name='change_grade'),
+
+    path('add_student/', views.add_student_in_subject, name='add_student'),
+    path('remove_student/', views.remove_student_from_subject, name='remove_student'),
 ]

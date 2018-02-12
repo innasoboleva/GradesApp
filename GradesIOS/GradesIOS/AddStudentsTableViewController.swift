@@ -11,43 +11,28 @@ import UIKit
 class AddStudentsTableViewController: UITableViewController, AddRemoveStudents {
     
     // protocol AddRemoveStudents
-    func addStudent(name: String) {
-        let new_student = Subject(name: name)
-        subject_students.append(new_student!)
-        let indexOfName = all_students.index(of: name)
-        list_of_added_students.insert(indexOfName!)
+    func addStudent(index: Int) {
+        current_students[all_students[index]] = 0
+        list_of_added_students.insert(all_students[index])
     }
     
-    func deleteStudent(name: String) {
-        let student = Subject(name: name)
-        let indexOfPerson = subject_students.index(of: student!)
-        subject_students.remove(at: indexOfPerson!)
-        let indexOfName = all_students.index(of: name)
-        list_of_removed_students.insert(indexOfName!)
+    func deleteStudent(index: Int) {
+        let _ = current_students.removeValue(forKey: all_students[index])
+        list_of_removed_students.insert(all_students[index])
     }
     
     // MARK: properties
     weak var delegate: TasksTableViewController?
-    var all_students = [String]()
-    var students = [Subject]()
-    var subject_students = [Subject]()
-    var list_of_added_students = Set<Int>()
-    var list_of_removed_students = Set<Int>()
+    var all_students = [User]()
+    var current_students = [User: Int]()
     
-    // MARK: private methods
-    private func loadSampleSubjects() {
-        for i in all_students {
-            guard let student = Subject(name: i) else {
-                fatalError("Unable to instantiate Student named: "+"\(i)")
-            }
-            students.append(student)
-        }
-    }
+    var list_of_added_students = Set<User>()
+    var list_of_removed_students = Set<User>()
+
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        loadSampleSubjects()
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -58,7 +43,7 @@ class AddStudentsTableViewController: UITableViewController, AddRemoveStudents {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.delegate?.studentsChanged(subject_students, list_added: list_of_added_students, list_removed: list_of_removed_students)
+        self.delegate?.studentsChanged(list_added: list_of_added_students, list_removed: list_of_removed_students)
       //  self.delegating?.newStudents(subject_students)
     }
 
@@ -76,7 +61,7 @@ class AddStudentsTableViewController: UITableViewController, AddRemoveStudents {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return students.count
+        return all_students.count
     }
     
 
@@ -86,28 +71,22 @@ class AddStudentsTableViewController: UITableViewController, AddRemoveStudents {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? AddStudentsTableViewCell else {
             fatalError("The dequeued cell is not an instance of AddStudentsTableViewCell.")
         }
-        // Fetches the appropriate task for the data source layout.
-        let student = students[indexPath.row]
+        let student = all_students[indexPath.row]
         
         cell.studentName.text = student.name
+        cell.atIndex = indexPath.row
         cell.delegating = self
         
-        for x in subject_students {
+        for x in current_students.keys {
             if x.name == student.name
             {
                 cell.buttonAdd.setTitle("Remove", for: UIControlState.normal)
                 break
             }
         }
-        
-
         return cell
     }
- 
 
-    
-    
-    
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

@@ -394,3 +394,195 @@ def login(request):
                                      'data_subject_student': data_subject_student,
                                      'data_task_student': data_task_student})
     return JsonResponse({'status': 'false', 'message': 'execution did not start'}, status=404)
+
+def change_task(request):
+    if request.method == "POST":
+        token = request.META["HTTP_AUTHORIZATION"]
+        try:
+            tok = Token.objects.get(key=token)
+            user = tok.user
+            teacher = False
+            for x in Permission.objects.filter(user=user):
+                if x.codename == "can_publish_student_subject":
+                    teacher = True
+                    break
+            if teacher:
+                json_data = json.loads((request.body).decode('utf-8'))
+                subject_id = json_data["subject_id"]
+                old_task_name = json_data["old_task_name"]
+                new_task_name = json_data["new_task_name"]
+
+                entries_for_task = Tasks.objects.filter(subject_id=subject_id,
+                                                teacher_id=user.id, task_name=old_task_name)
+                for entry in entries_for_task:
+                    entry.task_name = new_task_name
+                    entry.save()
+
+                entries_for_grades = Student_Grade(subject_id=subject_id,
+                                                teacher_id=user.id, task_name=old_task_name)
+
+                for entry in entries_for_grades:
+                    entry.task_name = new_task_name
+                    entry.save()
+
+                return JsonResponse({'status': 'ok'})
+            else:
+                JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
+        except:
+            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
+    return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)
+
+def change_subject(request):
+    if request.method == "POST":
+        token = request.META["HTTP_AUTHORIZATION"]
+        try:
+            tok = Token.objects.get(key=token)
+            user = tok.user
+            teacher = False
+            for x in Permission.objects.filter(user=user):
+                if x.codename == "can_publish_subjects":
+                    teacher = True
+                    break
+            if teacher:
+                json_data = json.loads((request.body).decode('utf-8'))
+                subject_id = json_data["subject_id"]
+                subject_name = json_data["subject_name"]
+
+                entries_for_subject = Subjects.objects.filter(subject_id=subject_id, teacher_id=user.id)
+                for entry in entries_for_subject:
+                    entry.subject_name = subject_name
+                    entry.save()
+
+                entries_for_sstudent_ubject = Student_Subject.objects.filter(subject_id=subject_id, teacher_id=user.id)
+                for entry in entries_for_sstudent_ubject:
+                    entry.subject_name = subject_name
+                    entry.save()
+
+                entries_for_task = Tasks.objects.filter(subject_id=subject_id, teacher_id=user.id)
+                for entry in entries_for_task:
+                    entry.subject_name = subject_name
+                    entry.save()
+
+                entries_for_grades = Student_Grade(subject_id=subject_id, teacher_id=user.id)
+                for entry in entries_for_grades:
+                    entry.subject_name = subject_name
+                    entry.save()
+
+                return JsonResponse({'status': 'ok'})
+            else:
+                JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
+        except:
+            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
+    return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)
+
+def change_grade(request):
+    if request.method == "POST":
+        token = request.META["HTTP_AUTHORIZATION"]
+        try:
+            tok = Token.objects.get(key=token)
+            user = tok.user
+            teacher = False
+            for x in Permission.objects.filter(user=user):
+                if x.codename == "can_publish_student_grade":
+                    teacher = True
+                    break
+            if teacher:
+                json_data = json.loads(request.body.decode('utf-8'))
+                subject_id = json_data["subject_id"]
+                task_name = json_data["task_name"]
+                user_grade = json_data["user_grade"]
+                student_id = json_data["student_id"]
+
+                entries_for_grade = Student_Grade.objects.filter(subject_id=subject_id, teacher_id=user.id,
+                                                                 student_id=student_id, task_name=task_name)
+                for entry in entries_for_grade:
+                    entry.user_grade = user_grade
+                    entry.save()
+
+                return JsonResponse({'status': 'ok'})
+            else:
+                JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
+        except:
+            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
+    return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)
+
+def add_student_in_subject(request):
+    if request.method == "POST":
+        token = request.META["HTTP_AUTHORIZATION"]
+        try:
+            tok = Token.objects.get(key=token)
+            user = tok.user
+            teacher = False
+            for x in Permission.objects.filter(user=user):
+                if x.codename == "can_publish_student_grade":
+                    teacher = True
+                    break
+            if teacher:
+                json_data = json.loads((request.body).decode('utf-8'))
+                subject_id = json_data["subject_id"]
+                students_id = json_data["students_id"]
+                fetch_subject_id = Subjects.objects.filter(subject_id=subject_id).first()
+
+                for student in students_id:
+
+                    fetch_users_name = User.objects.filter(id=student).filrst()
+                    new_student_subject = Student_Subject.objects(student_id=student,
+                                                                  student_name=fetch_users_name.last_name,
+                                                                  subject_id=subject_id,
+                                                                  subject_name=fetch_subject_id.subject_name,
+                                                                  teacher_id=user.id, teacher_name=user.last_name)
+                    new_student_subject.save()
+
+                    fetch_tasks = Tasks.objects.filter(subject_id=subject_id)
+                    for task in fetch_tasks:
+                        new_student_grade = Student_Grade.objects(student_id=student,
+                                                                  student_name=fetch_users_name.last_name,
+                                                                  subject_id=subject_id,
+                                                                  subject_name=fetch_subject_id.subject_name,
+                                                                  teacher_id=user.id,
+                                                                  teacher_name=user.last_name,
+                                                                  task_name=task.task_name,
+                                                                  task_grade=0)
+                        new_student_grade.save()
+
+
+                return JsonResponse({'status': 'ok'})
+            else:
+                JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
+        except:
+            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
+    return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)
+
+def remove_student_from_subject(request):
+    if request.method == "POST":
+        token = request.META["HTTP_AUTHORIZATION"]
+        try:
+            tok = Token.objects.get(key=token)
+            user = tok.user
+            teacher = False
+            for x in Permission.objects.filter(user=user):
+                if x.codename == "can_publish_student_grade":
+                    teacher = True
+                    break
+            if teacher:
+                json_data = json.loads((request.body).decode('utf-8'))
+                subject_id = json_data["subject_id"]
+                students_id = json_data["students_id"]
+
+                for student in students_id:
+                    student_subject = Student_Subject.objects.filter(student_id=student,
+                                                                     subject_id=subject_id)
+                    for each_student in student_subject:
+                        each_student.delete()
+
+                    students_grades = Student_Grade.objects.filter(student_id=student,
+                                                                   subject_id=subject_id)
+                    for each_grade in students_grades:
+                        each_grade.delete()
+
+                return JsonResponse({'status': 'ok'})
+            else:
+                JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
+        except:
+            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
+    return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)

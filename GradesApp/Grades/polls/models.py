@@ -40,4 +40,4 @@ class Student_Grade(models.Model):
     teacher_id = models.IntegerField()
     teacher_name = models.CharField(max_length=30)
     task_name = models.CharField(max_length=50)
-    task_grade = models.CharField(max_length=2)
+    task_grade = models.IntegerField() # 0 for nil, 1 for 'A', 2 for 'B', 3 for 'C', 4 for 'D', 5 for 'E'
