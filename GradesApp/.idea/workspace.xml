@@ -24,8 +24,8 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Grades/polls/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.72259134">
-              <caret line="364" column="79" selection-start-line="364" selection-start-column="79" selection-end-line="364" selection-end-column="79" />
+            <state vertical-scroll-proportion="6.4784055">
+              <caret line="260" column="94" selection-start-line="260" selection-start-column="94" selection-end-line="260" selection-end-column="94" />
               <folding>
                 <element signature="e#26#75#0" expanded="true" />
               </folding>
@@ -37,7 +37,7 @@
         <entry file="file://$PROJECT_DIR$/Grades/polls/models.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="24" column="95" selection-start-line="24" selection-start-column="95" selection-end-line="24" selection-end-column="95" />
+              <caret line="47" column="14" selection-start-line="47" selection-start-column="4" selection-end-line="47" selection-end-column="14" />
               <folding />
             </state>
           </provider>
@@ -47,7 +47,7 @@
         <entry file="file://$PROJECT_DIR$/Grades/polls/urls.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="9" column="19" selection-start-line="9" selection-start-column="19" selection-end-line="9" selection-end-column="19" />
+              <caret line="14" column="70" selection-start-line="14" selection-start-column="70" selection-end-line="14" selection-end-column="70" />
               <folding />
             </state>
           </provider>
@@ -70,9 +70,9 @@
         <option value="$PROJECT_DIR$/Grades/templates/subjects.html" />
         <option value="$PROJECT_DIR$/Grades/templates/teacher_s.html" />
         <option value="$PROJECT_DIR$/Grades/Grades/urls.py" />
-        <option value="$PROJECT_DIR$/Grades/polls/urls.py" />
         <option value="$PROJECT_DIR$/Grades/Grades/settings.py" />
         <option value="$PROJECT_DIR$/Grades/polls/models.py" />
+        <option value="$PROJECT_DIR$/Grades/polls/urls.py" />
         <option value="$PROJECT_DIR$/Grades/polls/views.py" />
       </list>
     </option>
@@ -590,7 +590,7 @@
     <entry file="file://$PROJECT_DIR$/Grades/polls/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="9" column="19" selection-start-line="9" selection-start-column="19" selection-end-line="9" selection-end-column="19" />
+          <caret line="14" column="70" selection-start-line="14" selection-start-column="70" selection-end-line="14" selection-end-column="70" />
           <folding />
         </state>
       </provider>
@@ -598,15 +598,15 @@
     <entry file="file://$PROJECT_DIR$/Grades/polls/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="24" column="95" selection-start-line="24" selection-start-column="95" selection-end-line="24" selection-end-column="95" />
+          <caret line="47" column="14" selection-start-line="47" selection-start-column="4" selection-end-line="47" selection-end-column="14" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Grades/polls/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.72259134">
-          <caret line="364" column="79" selection-start-line="364" selection-start-column="79" selection-end-line="364" selection-end-column="79" />
+        <state vertical-scroll-proportion="6.4784055">
+          <caret line="260" column="94" selection-start-line="260" selection-start-column="94" selection-end-line="260" selection-end-column="94" />
           <folding>
             <element signature="e#26#75#0" expanded="true" />
           </folding>

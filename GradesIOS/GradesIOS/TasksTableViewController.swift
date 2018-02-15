@@ -96,8 +96,6 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
             }
         }
         task.resume()
-        
-        
     }
     
     // MARK: properties
@@ -113,22 +111,97 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
     
     @IBAction func unwindToTasksList(sender: UIStoryboardSegue) {
         if let sourceViewController = sender.source as? NewTaskViewController,
-            let new_task = sourceViewController.task {
-            // Add a new task
-            let newIndexPath = IndexPath(row: tasks.count, section: 0)
+            let new_task = sourceViewController.newTaskName.text {
             
-            if tasks.count > 0 {
-                // keeping students data up to date
-                let last_task = tasks[tasks.count - 1]
-                dict_tasks[new_task] = dict_tasks[last_task]
-                let dict_keys = dict_tasks[new_task]?.keys
-                // setiing grades for a new task to 0
-                for each_user in dict_keys! {
-                    dict_tasks[new_task]?[each_user] = 0
+            if !(new_task.isEmpty) {
+                
+                let json: [String: Any] = ["task": new_task, "subject_id": String(subject!.uid), "subject": subject?.name]
+                let jsonData = try? JSONSerialization.data(withJSONObject: json)
+                // post request to add new task to database
+                let url = URL(string: "http://127.0.0.1:8000/polls/add_new_task/")!
+                var request = URLRequest(url: url)
+                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
+                request.httpMethod = "POST"
+                request.httpBody = jsonData
+                
+                let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                    guard let data = data, error == nil else {
+                        print(error?.localizedDescription ?? "No data")
+                        return
+                    }
+                    let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                    if let responseJSON = responseJSON as? [String: Any] {
+                        
+                        if responseJSON["status"] as? String == "ok" {
+                            let task_id = responseJSON["task_id"] as? String
+                            let id = Int(task_id!)
+                            let student_task = Task(uid: id!, name: new_task)
+                            
+                            let newIndexPath = IndexPath(row: self.tasks.count, section: 0)
+                            self.tasks.append(student_task!)
+                            
+                            OperationQueue.main.addOperation {
+                                self.tableView.insertRows(at: [newIndexPath], with: .automatic)
+                            }
+                            
+                            DispatchQueue.main.async {
+                                self.dict_tasks[student_task!] = [User: Int]()
+                                
+                                var users_exist = false
+                                var users_exist_in_task: Task?
+                                for task in self.dict_tasks.keys {
+                                    if users_exist {
+                                        break
+                                    }
+                                    for user in self.dict_tasks[task]!.keys {
+                                        if !(user.name.isEmpty) {
+                                            users_exist = true
+                                            users_exist_in_task = task
+                                            break
+                                        }
+                                    }
+                                }
+                                
+                                if users_exist {
+                                    let json_grades: [String: Any] = ["task": new_task, "subject_id": String(self.subject!.uid), "subject": self.subject?.name, "task_with_data": users_exist_in_task?.name]
+                                    let jsonDataGrades = try? JSONSerialization.data(withJSONObject: json_grades)
+                                    // post request to add new grades to database
+                                    let url_grades = URL(string: "http://127.0.0.1:8000/polls/add_grades/")!
+                                    var request_grades = URLRequest(url: url_grades)
+                                    request_grades.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                                    request_grades.addValue(self.raw_token!, forHTTPHeaderField: "Authorization")
+                                    request_grades.httpMethod = "POST"
+                                    request_grades.httpBody = jsonDataGrades
+                                    let task_grade = URLSession.shared.dataTask(with: request_grades) { data2, response2, error2 in
+                                        guard let data2 = data2, error2 == nil else {
+                                            print(error2?.localizedDescription ?? "No data")
+                                            return
+                                        }
+                                        let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                        if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                            if responseJSON2["status"] as? String == "ok" {
+                                                
+                                                // keeping students data up to date
+                                                self.dict_tasks[student_task!] = self.dict_tasks[users_exist_in_task!]
+                                                let dict_keys = self.dict_tasks[student_task!]?.keys
+                                                // setting grades for a new task to 0
+                                                for each_user in dict_keys! {
+                                                    self.dict_tasks[student_task!]?[each_user] = 0
+                                                }
+                                            }
+                                        }
+                                    }
+                                    task_grade.resume()
+                                }
+                            }
+                            
+                        }
+                    }
                 }
+                task.resume()
             }
-            tasks.append(new_task)
-            tableView.insertRows(at: [newIndexPath], with: .automatic)
+            
         } 
         else if let sourceViewController = sender.source as? EditTasksTableViewController {
             var counter = 0
@@ -257,15 +330,6 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     editTaskController.list_of_tasks = self.tasks
             } else {
                 fatalError("Unable to send data to EditTasksTableViewController")
-            }
-        }
-        else if segue.identifier == "NewTaskSegue" {
-            if let navigationController = segue.destination as? UINavigationController,
-                let newTaskController = navigationController.topViewController as? NewTaskViewController {
-                newTaskController.raw_token = self.raw_token
-                newTaskController.subject = self.subject
-            } else {
-                fatalError("Unable to send data to NewTaskViewController")
             }
         }
     }

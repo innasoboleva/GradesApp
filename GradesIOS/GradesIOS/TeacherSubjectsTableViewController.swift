@@ -35,11 +35,56 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
     //MARK: Actions
     
     @IBAction func unwindToSubjectsList(sender: UIStoryboardSegue) {
-        if let sourceViewController = sender.source as? NewSubjectViewController, let newsubject = sourceViewController.subject {
-            // Add a new subject.
-            let newIndexPath = IndexPath(row: subjects.count, section: 0)
-            subjects.append(newsubject)
-            tableView.insertRows(at: [newIndexPath], with: .automatic)
+        if let sourceViewController = sender.source as? NewSubjectViewController,
+            let name = sourceViewController.newSubjectName.text {
+            if !(name.isEmpty) {
+                
+                let json: [String: Any] = ["subject": name]
+                let jsonData = try? JSONSerialization.data(withJSONObject: json)
+                // post request to add new subject to database
+                let url = URL(string: "http://127.0.0.1:8000/polls/add_new_subject/")!
+                var request = URLRequest(url: url)
+                request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
+                request.httpMethod = "POST"
+                request.httpBody = jsonData
+                
+                let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                    guard let data = data, error == nil else {
+                        print(error?.localizedDescription ?? "No data")
+                        return
+                    }
+                    let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                    if let responseJSON = responseJSON as? [String: Any] {
+                        
+                        if responseJSON["status"] as? String == "ok" {
+                            if let subject_id = responseJSON["subject_id"] as? String {
+                                let id = Int(subject_id)
+                                let new_subject = Subject(uid: id!, name: name)
+                                
+                                // Add a new subject.
+                                let newIndexPath = IndexPath(row: self.subjects.count, section: 0)
+                                self.subjects.append(new_subject!)
+                                self.tasks[new_subject!] = [Task]()
+                                self.dict[new_subject!] = [Task: [User: Int]]()
+                                
+                                OperationQueue.main.addOperation {
+                                    self.tableView.insertRows(at: [newIndexPath], with: .automatic)
+                                }
+                                
+                            }
+                        } else {
+                            let alertController = UIAlertController(title: "Error", message: "Could not add new subject, please try again.", preferredStyle: UIAlertControllerStyle.alert)
+                            
+                            let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
+                            alertController.addAction(okAction)
+                            self.present(alertController, animated: true, completion: nil)
+                        }
+                    }
+                }
+                task.resume()
+            }
+            
         } else if let sourceViewController = sender.source as? EditSubjectTableViewController {
             var counter = 0
             for each_subject in sourceViewController.list_of_subjects {
@@ -120,12 +165,11 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
         let students_keys = all_students_data.keys
         for key in students_keys {
             let new_id = Int(key)
-            let first = all_students_data[key]![0]
+            // let first = all_students_data[key]![0]
             let last = all_students_data[key]![1]
             let new_student = User(uid: new_id!, name: "\(last)")
             all_students.append(new_student!)
         }
-        print(all_data)
     }
     
     // MARK: segues information transfer
@@ -157,14 +201,6 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                     editSubjectController.list_of_subjects = self.subjects
             } else {
                 fatalError("Unable to send data to EditSubjectTableViewController")
-            }
-        }
-        else if segue.identifier == "addNewSubjectSegue" {
-            if let navigationController = segue.destination as? UINavigationController,
-                let newSubjectController = navigationController.topViewController as? NewSubjectViewController {
-                newSubjectController.raw_token = self.raw_token
-            } else {
-                fatalError("Unable to send data to NewSubjectViewController")
             }
         }
     }

@@ -238,6 +238,7 @@ def load_students_grades(request):
 
 
 def add_grades_to_students(request):
+    # adding NEW grades to database
     if request.method == "POST":
         token = request.META["HTTP_AUTHORIZATION"]
         try:
@@ -253,14 +254,16 @@ def add_grades_to_students(request):
                 subject_id = json_data["subject_id"]
                 subject_name = json_data["subject"]
                 task = json_data["task"]
-                student_id = json_data["student_id"]
-                student_name = json_data["student_name"]
-                grade = json_data["grade"]
+                task_with_students = json_data["task_with_data"]
 
-                entry = StudentGrade(subject_id=subject_id, subject_name=subject_name,
-                                      teacher_id=user.id, teacher_name=user.last_name, task_name=task,
-                                      student_id=student_id, student_name=student_name,task_grade=grade)
-                entry.save()
+                # check existing tasks and students in a subjects table
+                students_in_a_task = StudentGrade.objects.filter(subject_id=int(subject_id),
+                                                                 task_name=task_with_students)
+                for each_student in students_in_a_task:
+                    new_entry = StudentGrade.new(each_student.student_id, each_student.student_name,
+                                                 int(subject_id), subject_name, user.id, user.last_name,
+                                                 task, 0)
+
                 return JsonResponse({'status': 'ok'})
             else:
                 JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
@@ -349,20 +352,17 @@ def check_login(request):
                     each_task = StudentGrade.objects.filter(subject_id=some.id)
                     data[str(some.id)] = {}
                     for line in each_task:
-                        print(some.subject_name)
-                        print(line.student_name)
-                        print("___")
+                        each_student = StudentGrade.objects.filter(subject_id=some.id, task_name=line.task_name)
                         data[str(some.id)][line.task_name] = []
-                        data[str(some.id)][line.task_name].append(
-                                [str(line.student_id), line.student_name, str(line.task_grade)])
+                        for student in each_student:
+                            list_of_info = [str(student.student_id), student.student_name, str(student.task_grade)]
+                            data[str(some.id)][line.task_name].append(list_of_info)
 
                 perm = Permission.objects.get(codename='can_read_subjects')
                 all_students = User.objects.filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).distinct()
                 data_all_students = {}
                 for person in all_students:
                     data_all_students[str(person.id)] = [person.first_name, person.last_name]
-
-                print(data) # grade wasnt saved and not all users are dicplayes
 
                 return JsonResponse({'status': 'ok', 'is_teacher': 'true', 'token': tok.key,
                                      'data_subjects': data_subjects,
@@ -493,7 +493,7 @@ def change_grade(request):
                 entries_for_grade = StudentGrade.objects.filter(subject_id=int(subject_id), teacher_id=user.id,
                                                                 student_id=int(student_id), task_name=task_name)
                 for entry in entries_for_grade:
-                    entry.user_grade = int(user_grade)
+                    entry.task_grade = int(user_grade)
                     entry.save()
 
                 return JsonResponse({'status': 'ok'})
