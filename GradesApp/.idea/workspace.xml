@@ -24,8 +24,8 @@
       <file leaf-file-name="views.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Grades/polls/views.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.09379968">
-              <caret line="555" column="31" selection-start-line="555" selection-start-column="4" selection-end-line="555" selection-end-column="31" />
+            <state vertical-scroll-proportion="0.72259134">
+              <caret line="364" column="79" selection-start-line="364" selection-start-column="79" selection-end-line="364" selection-end-column="79" />
               <folding>
                 <element signature="e#26#75#0" expanded="true" />
               </folding>
@@ -37,7 +37,7 @@
         <entry file="file://$PROJECT_DIR$/Grades/polls/models.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="27" column="11" selection-start-line="27" selection-start-column="6" selection-end-line="27" selection-end-column="11" />
+              <caret line="24" column="95" selection-start-line="24" selection-start-column="95" selection-end-line="24" selection-end-column="95" />
               <folding />
             </state>
           </provider>
@@ -47,7 +47,7 @@
         <entry file="file://$PROJECT_DIR$/Grades/polls/urls.py">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="24" column="21" selection-start-line="24" selection-start-column="21" selection-end-line="24" selection-end-column="21" />
+              <caret line="9" column="19" selection-start-line="9" selection-start-column="19" selection-end-line="9" selection-end-column="19" />
               <folding />
             </state>
           </provider>
@@ -70,10 +70,10 @@
         <option value="$PROJECT_DIR$/Grades/templates/subjects.html" />
         <option value="$PROJECT_DIR$/Grades/templates/teacher_s.html" />
         <option value="$PROJECT_DIR$/Grades/Grades/urls.py" />
+        <option value="$PROJECT_DIR$/Grades/polls/urls.py" />
         <option value="$PROJECT_DIR$/Grades/Grades/settings.py" />
         <option value="$PROJECT_DIR$/Grades/polls/models.py" />
         <option value="$PROJECT_DIR$/Grades/polls/views.py" />
-        <option value="$PROJECT_DIR$/Grades/polls/urls.py" />
       </list>
     </option>
   </component>
@@ -571,14 +571,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Grades/Grades/settings.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.023847377">
-          <caret line="48" column="39" selection-start-line="48" selection-start-column="39" selection-end-line="48" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Grades/Grades/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.47694755">
@@ -587,10 +579,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Grades/Grades/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="49" column="60" selection-start-line="49" selection-start-column="60" selection-end-line="49" selection-end-column="60" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Grades/polls/urls.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="24" column="21" selection-start-line="24" selection-start-column="21" selection-end-line="24" selection-end-column="21" />
+          <caret line="9" column="19" selection-start-line="9" selection-start-column="19" selection-end-line="9" selection-end-column="19" />
           <folding />
         </state>
       </provider>
@@ -598,15 +598,15 @@
     <entry file="file://$PROJECT_DIR$/Grades/polls/models.py">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="27" column="11" selection-start-line="27" selection-start-column="6" selection-end-line="27" selection-end-column="11" />
+          <caret line="24" column="95" selection-start-line="24" selection-start-column="95" selection-end-line="24" selection-end-column="95" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Grades/polls/views.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.09379968">
-          <caret line="555" column="31" selection-start-line="555" selection-start-column="4" selection-end-line="555" selection-end-column="31" />
+        <state vertical-scroll-proportion="0.72259134">
+          <caret line="364" column="79" selection-start-line="364" selection-start-column="79" selection-end-line="364" selection-end-column="79" />
           <folding>
             <element signature="e#26#75#0" expanded="true" />
           </folding>

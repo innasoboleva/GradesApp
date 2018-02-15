@@ -15,6 +15,7 @@ class NewTaskViewController: UIViewController {
     @IBOutlet weak var newTaskName: UITextField!
     @IBOutlet weak var addTaskButton: UIButton!
     
+    var subject: Subject?
     var task: Task?
     var raw_token: String?
     
@@ -35,9 +36,9 @@ class NewTaskViewController: UIViewController {
         
         let name = newTaskName.text ?? ""
         
-        if newTaskName.text != nil {
-            
-            let json: [String: Any] = ["task": name]
+        if newTaskName.text != nil && subject != nil {
+
+            let json: [String: Any] = ["task": name, "subject_id": String(subject!.uid), "subject": subject?.name]
             let jsonData = try? JSONSerialization.data(withJSONObject: json)
             // post request to add new task to database
             let url = URL(string: "http://127.0.0.1:8000/polls/add_new_task/")!

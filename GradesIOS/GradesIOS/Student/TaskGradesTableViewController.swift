@@ -10,11 +10,14 @@ import UIKit
 
 class TaskGradesTableViewController: UITableViewController {
     
-    var tasks_to_show = [String]()
-    var grades = [String]()
+    let grades = [" ", "A","B","C","D","E"]
+    var tasks_to_show = [String: String]()
+    var tasks = [String]()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        tasks = Array(tasks_to_show.keys)
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -37,7 +40,7 @@ class TaskGradesTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return tasks_to_show.count
+        return tasks.count
     }
 
     
@@ -48,8 +51,9 @@ class TaskGradesTableViewController: UITableViewController {
             fatalError("The dequeued cell is not an instance of TaskGradesTableViewCell.")
         }
         // Fetches the appropriate subject for the data source layout.
-        cell.taskName.text = tasks_to_show[indexPath.row]
-        cell.grade.text = grades[indexPath.row]
+        let grade_string = tasks_to_show[tasks[indexPath.row]]!
+        cell.taskName.text = tasks[indexPath.row]
+        cell.grade.text = grades[Int(grade_string)!]
         
         return cell
     }

@@ -19,9 +19,14 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
         for student in list_removed {
             students_removed_array.append(String(student.uid))
         }
+        // for sending subject_id as a String
+        var sub_id = String()
+        if let subjects_id = subject?.uid {
+            sub_id = String(describing: subjects_id)
+        }
         
         // for keeping database up to date
-        let json: [String: Any] = ["subject_id": String(describing: self.subject?.uid), "students_id": students_added_array]
+        let json: [String: Any] = ["subject_id": sub_id, "subject_name": subject?.name, "students_id": students_added_array]
         let jsonData = try? JSONSerialization.data(withJSONObject: json)
         // post request to change students in a database
         let url = URL(string: "http://127.0.0.1:8000/polls/add_student/")!
@@ -48,6 +53,42 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                             self.dict_tasks[key]![user] = 0
                         }
                     }
+                    
+                    // adding students first then removing
+                    let json_remove: [String: Any] = ["subject_id": sub_id, "students_id": students_removed_array]
+                    let jsonDataRemove = try? JSONSerialization.data(withJSONObject: json_remove)
+                    // post request to change students in a database
+                    let url_remove = URL(string: "http://127.0.0.1:8000/polls/remove_student/")!
+                    var request_remove = URLRequest(url: url_remove)
+                    request_remove.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                    request_remove.addValue(self.raw_token!, forHTTPHeaderField: "Authorization")
+                    request_remove.httpMethod = "POST"
+                    request_remove.httpBody = jsonDataRemove
+                    
+                    let task_remove = URLSession.shared.dataTask(with: request_remove) { data, response, error in
+                        guard let data = data, error == nil else {
+                            print(error?.localizedDescription ?? "No data")
+                            return
+                        }
+                        let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                        if let responseJSON = responseJSON as? [String: Any] {
+                            
+                            if responseJSON["status"] as? String == "ok" {
+                                // for keeping Dict instance up to date with the changes
+                                for user in list_removed {
+                                    let dict_keys = self.dict_tasks.keys
+                                    for key in dict_keys {
+                                        let _ = self.dict_tasks[key]!.removeValue(forKey: user)
+                                    }
+                                }
+                            } else {
+                                // Unable to remove students in a database
+                                print(error?.localizedDescription ?? "Unable to remove students in a database")
+                            }
+                        }
+                    }
+                    task_remove.resume()
+                    
                 } else {
                     // Unable to add students in a database
                     print(error?.localizedDescription ?? "Unable to add students in a database")
@@ -56,39 +97,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
         }
         task.resume()
         
-        let json_remove: [String: Any] = ["subject_id": String(describing: self.subject?.uid), "students_id": students_removed_array]
-        let jsonDataRemove = try? JSONSerialization.data(withJSONObject: json_remove)
-        // post request to change students in a database
-        let url_remove = URL(string: "http://127.0.0.1:8000/polls/remove_student/")!
-        var request_remove = URLRequest(url: url_remove)
-        request_remove.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request_remove.addValue(raw_token!, forHTTPHeaderField: "Authorization")
-        request_remove.httpMethod = "POST"
-        request_remove.httpBody = jsonData
         
-        let task_remove = URLSession.shared.dataTask(with: request_remove) { data, response, error in
-            guard let data = data, error == nil else {
-                print(error?.localizedDescription ?? "No data")
-                return
-            }
-            let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
-            if let responseJSON = responseJSON as? [String: Any] {
-                
-                if responseJSON["status"] as? String == "ok" {
-                    // for keeping Dict instance up to date with the changes
-                    for user in list_removed {
-                        let dict_keys = self.dict_tasks.keys
-                        for key in dict_keys {
-                            let _ = self.dict_tasks[key]!.removeValue(forKey: user)
-                        }
-                    }
-                } else {
-                    // Unable to remove students in a database
-                    print(error?.localizedDescription ?? "Unable to remove students in a database")
-                }
-            }
-        }
-        task_remove.resume()
     }
     
     // MARK: properties
@@ -171,11 +180,22 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
             let current_task = sourceViewController.current_task
             let old_users_grades = dict_tasks[current_task!]?.keys
             let dict_keys = new_users_grades.keys
+            
+            // for sending subject_id as a String
+            var sub_id = String()
+            if let subjects_id = subject?.uid {
+                sub_id = String(describing: subjects_id)
+            }
+            
             for key in dict_keys {
                 if new_users_grades[key] != dict_tasks[current_task!]![key] {
                     // if grade has changed
+                    var grade_int = String()
+                    if let grade = new_users_grades[key] {
+                        grade_int = String(describing: grade)
+                    }
                     // for keeping database correct
-                    let json: [String: Any] = ["subject_id": String(describing: self.subject?.uid), "task_name": current_task!.name, "student_id": key.uid, "user_grade": new_users_grades[key]]
+                    let json: [String: Any] = ["subject_id": sub_id, "task_name": current_task!.name, "student_id": String(describing: key.uid), "user_grade": grade_int]
                     let jsonData = try? JSONSerialization.data(withJSONObject: json)
                     // post request to change user's grade in a database
                     let url = URL(string: "http://127.0.0.1:8000/polls/change_grade/")!
@@ -218,7 +238,9 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
         
         if segue.identifier == "ShowDetailStudent" {
             if let toViewController = segue.destination as? StudentGradesTableViewController {
-                toViewController.user_grades = self.dict_tasks[tasks[tableView.indexPathForSelectedRow!.row]]!
+                if let users_exist = self.dict_tasks[tasks[tableView.indexPathForSelectedRow!.row]] {
+                    toViewController.user_grades = users_exist
+                }
                 toViewController.all_students = self.all_students
                 toViewController.subject = self.subject
                 toViewController.current_task = self.tasks[tableView.indexPathForSelectedRow!.row]
@@ -240,7 +262,8 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
         else if segue.identifier == "NewTaskSegue" {
             if let navigationController = segue.destination as? UINavigationController,
                 let newTaskController = navigationController.topViewController as? NewTaskViewController {
-                    newTaskController.raw_token = self.raw_token
+                newTaskController.raw_token = self.raw_token
+                newTaskController.subject = self.subject
             } else {
                 fatalError("Unable to send data to NewTaskViewController")
             }

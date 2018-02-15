@@ -11,18 +11,22 @@ import UIKit
 class StudentSubjectTableViewController: UITableViewController {
     
     // initial data
-    var subjects = ["Astronomy", "Math", "Pysics", "Astrology", "Literature"]
-    var tasks = [["Stars", "Asteroids", "Meteors"], ["Logarithm"], ["One"], ["Two"], ["Three"]]
-    var grades = [["A", "B", "C"], ["A"],["A"], ["B"], ["B"]]
+    var raw_token: String?
+    var data_subjects = [String: String]() // id:name
+    var data_grades = [String: [String: String]]() // subject_id: [task_name: task_grade]
+    
+    var subjects = [String]()
+    
+//    var subjects = ["Astronomy", "Math", "Pysics", "Astrology", "Literature"]
+//    var tasks = [["Stars", "Asteroids", "Meteors"], ["Logarithm"], ["One"], ["Two"], ["Three"]]
+//    var grades = [["A", "B", "C"], ["A"],["A"], ["B"], ["B"]]
     
     // navigation
-    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
         
         if let toViewController = segue.destination as? TaskGradesTableViewController {
-            toViewController.tasks_to_show = tasks[tableView.indexPathForSelectedRow!.row]
-            toViewController.grades = grades[tableView.indexPathForSelectedRow!.row]
+            toViewController.tasks_to_show = data_grades[subjects[tableView.indexPathForSelectedRow!.row]]!
         } else {
             fatalError("Unable to send data to Tasks view")
         }
@@ -31,6 +35,7 @@ class StudentSubjectTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        subjects = Array(data_subjects.keys)
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -63,7 +68,7 @@ class StudentSubjectTableViewController: UITableViewController {
             fatalError("The dequeued cell is not an instance of StudentSubjectTableViewCell.")
         }
         // Fetches the appropriate subject for the data source layout.
-        cell.subjectName.text = subjects[indexPath.row]
+        cell.subjectName.text = data_subjects[subjects[indexPath.row]]
         
         return cell
     }

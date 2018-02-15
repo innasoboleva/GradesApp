@@ -33,7 +33,6 @@ class AddStudentsTableViewController: UITableViewController, AddRemoveStudents {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 
@@ -44,7 +43,7 @@ class AddStudentsTableViewController: UITableViewController, AddRemoveStudents {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         self.delegate?.studentsChanged(list_added: list_of_added_students, list_removed: list_of_removed_students)
-      //  self.delegating?.newStudents(subject_students)
+      
     }
 
     override func didReceiveMemoryWarning() {

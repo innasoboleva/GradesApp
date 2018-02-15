@@ -7,7 +7,7 @@ from . import views
 urlpatterns = [
 
     path('get_auth_token/', rest_framework_views.obtain_auth_token, name='get_auth_token'),
-    path('login/', views.login, name='login'),
+    path('check_login/', views.check_login, name='check_login'),
     path('new_user/', views.create_new_user, name='create_new_user'),
 
     path('add_new_subject/', views.add_new_subject, name='add_new_subject'),

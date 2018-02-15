@@ -56,9 +56,16 @@ class NewSubjectViewController: UIViewController, UITextFieldDelegate {
                 if let responseJSON = responseJSON as? [String: Any] {
                     
                     if responseJSON["status"] as? String == "ok" {
-                        let subject_id = responseJSON["subject_id"] as? String
-                        let id = Int(subject_id!)
-                        self.subject = Subject(uid: id!, name: name)
+                        if let subject_id = responseJSON["subject_id"] as? String {
+                            let id = Int(subject_id)
+                            self.subject = Subject(uid: id!, name: name)
+                        }
+                    } else {
+                        let alertController = UIAlertController(title: "Error", message: "Could not add new subject, please try again.", preferredStyle: UIAlertControllerStyle.alert)
+                        
+                        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
+                        alertController.addAction(okAction)
+                        self.present(alertController, animated: true, completion: nil)
                     }
                 }
             }

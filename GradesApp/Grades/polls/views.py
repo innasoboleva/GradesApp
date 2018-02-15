@@ -3,13 +3,13 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 import json
 
 from django.db.models import Q
 
 from django.contrib.auth.models import User
-from .models import Subjects, Student_Subject, Student_Grade, Tasks
+from .models import Subjects, StudentSubject, StudentGrade, Tasks
 
 
 def create_permissions():
@@ -24,7 +24,7 @@ def create_permissions():
         name='Can Read Subjects',
         content_type=content_type,
     )
-    content_type = ContentType.objects.get_for_model(Student_Subject)
+    content_type = ContentType.objects.get_for_model(StudentSubject)
     permission = Permission.objects.create(
         codename='can_publish_student_subject',
         name='Can Publish Student_Subject',
@@ -35,7 +35,7 @@ def create_permissions():
         name='Can Read Student Subject',
         content_type=content_type,
     )
-    content_type = ContentType.objects.get_for_model(Student_Grade)
+    content_type = ContentType.objects.get_for_model(StudentGrade)
     permission = Permission.objects.create(
         codename='can_publish_student_grade',
         name='Can Publish Student Grade',
@@ -47,11 +47,11 @@ def create_permissions():
         content_type=content_type,
     )
 
+
 def create_new_user(request):
-    # If didn't set the permissions before, run this:
-    # create_permissions()
+    # If didn't set permissions before, run create_permissions()
     if request.method == "POST":
-        json_data = json.loads((request.body).decode('utf-8'))
+        json_data = json.loads(request.body.decode('utf-8'))
         new_login = json_data["username"]
         new_password = json_data["password"]
         new_email = json_data["email"]
@@ -85,14 +85,19 @@ def create_new_user(request):
         new_user.save()
         token = Token.objects.create(user=new_user)
 
-
         if new_permissions == "true":
-            data = {"token": token.key, "is_teacher": "true", "subjects": []}
+            perm = Permission.objects.get(codename='can_read_subjects')
+            all_students = User.objects.filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).distinct()
+            data_all_students = {}
+            for person in all_students:
+                data_all_students[person.id] = (person.first_name, person.last_name)
+            data = {"token": token.key, "is_teacher": "true", "all_students": data_all_students}
             return JsonResponse(data)
         else:
-            data = {"token": token.key, "is_teacher": "false", "subjects": []}
+            data = {"token": token.key, "is_teacher": "false"}
             return JsonResponse(data)
     return JsonResponse({'status': 'false', 'message': 'execution did not start'}, status=500)
+
 
 def load_subjects(request):
     if request.method == "GET":
@@ -113,21 +118,16 @@ def load_subjects(request):
                     data_subjects[subject.subject_id] = subject.subject_name
 
                 data_task = {}
-                tasks = Student_Grade.objects.filter(teacher_id=user.id)
+                tasks = StudentGrade.objects.filter(teacher_id=user.id)
                 for task in tasks:
-                    data_task[task.subject_id] = (task.task_name)
-
+                    data_task[task.subject_id] = task.task_name
 
                 data = {}
                 for some in subjects:
-                    each_task = Student_Grade.objects.filter(subject_id=some.subject_id)
+                    each_task = StudentGrade.objects.filter(subject_id=some.subject_id)
                     data[some.subject_id] = {}
                     for line in each_task:
                         data[some.subject_id][line.task_name] = (line.student_name, line.task_grade)
-
-                # data_students = {}
-                # for task in tasks:
-                #     data_students[task.task_name] = (task.student_name, task.task_grade)
 
                 perm = Permission.objects.get(codename='can_read_subjects')
                 all_students = User.objects.filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).distinct()
@@ -140,13 +140,13 @@ def load_subjects(request):
 
             else:
                 data_subject_student = {}
-                subjects = Student_Subject.objects.filter(student_id=user.id)
+                subjects = StudentSubject.objects.filter(student_id=user.id)
                 for each in subjects:
                     data_subject_student[each.subject_id] = each.subject_name
 
                 data_task_student = {}
                 for each_one in subjects:
-                    tasks = Student_Grade.objects.filter(subject_id=each_one.subject_id)
+                    tasks = StudentGrade.objects.filter(subject_id=each_one.subject_id)
                     data_task_student[each_one.subject_id] = {}
                     for each in tasks:
                         data_task_student[each.subject_id][each.task_name] = each.task_grade
@@ -172,26 +172,22 @@ def load_tasks(request):
                     break
 
             if teacher:
-                json_data = json.loads((request.body).decode('utf-8'))
+                json_data = json.loads(request.body.decode('utf-8'))
                 subject_id = json_data["subject_id"]
-                #subject_name = json_data["subject"]
 
                 data_task = {}
-                tasks = Student_Grade.objects.filter(teacher_id=user.id, subject_id=subject_id)
+                tasks = StudentGrade.objects.filter(teacher_id=user.id, subject_id=subject_id)
                 for task in tasks:
-                    data_task[task.subject_id] = (task.task_name)
-
+                    data_task[task.subject_id] = task.task_name
 
                 data = {}
-                each_task = Student_Grade.objects.filter(subject_id=subject_id, teacher_id=user.id)
+                each_task = StudentGrade.objects.filter(subject_id=subject_id, teacher_id=user.id)
                 for line in each_task:
                     data[line.task_name] = (line.student_name, line.task_grade)
 
                 return JsonResponse({'status': 'ok', 'token': tok.key,
                                      'data_task': data_task, 'all_data': data})
-
             else:
-
                 return JsonResponse({'status': 'false', 'message': 'tasks supposed to read by teacher'}, status=500)
         except:
             return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
@@ -211,12 +207,12 @@ def load_students_grades(request):
                     break
 
             if teacher:
-                json_data = json.loads((request.body).decode('utf-8'))
+                json_data = json.loads(request.body.decode('utf-8'))
                 subject_id = json_data["subject_id"]
                 task_name = json_data["task_name"]
 
                 data = {}
-                each_task = Student_Grade.objects.filter(subject_id=subject_id,
+                each_task = StudentGrade.objects.filter(subject_id=subject_id,
                                                          teacher_id=user.id, task_name=task_name)
                 for line in each_task:
                     data[line.student_name] = line.task_grade
@@ -229,7 +225,7 @@ def load_students_grades(request):
                 subject_id = json_data["subject_id"]
 
                 data = {}
-                each_task = Student_Grade.objects.filter(subject_id=subject_id,
+                each_task = StudentGrade.objects.filter(subject_id=subject_id,
                                                          student_id=user.id)
                 for line in each_task:
                     data[line.task_name] = line.task_grade
@@ -239,6 +235,7 @@ def load_students_grades(request):
         except:
             return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
     return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)
+
 
 def add_grades_to_students(request):
     if request.method == "POST":
@@ -252,7 +249,7 @@ def add_grades_to_students(request):
                     teacher = True
                     break
             if teacher:
-                json_data = json.loads((request.body).decode('utf-8'))
+                json_data = json.loads(request.body.decode('utf-8'))
                 subject_id = json_data["subject_id"]
                 subject_name = json_data["subject"]
                 task = json_data["task"]
@@ -260,9 +257,9 @@ def add_grades_to_students(request):
                 student_name = json_data["student_name"]
                 grade = json_data["grade"]
 
-                entry = Student_Grade.objects(subject_id=subject_id, subject_name=subject_name,
-                                                teacher_id=user.id, teacher_name=user.last_name, task_name=task,
-                                              student_id=student_id, student_name=student_name,task_grade=grade)
+                entry = StudentGrade(subject_id=subject_id, subject_name=subject_name,
+                                      teacher_id=user.id, teacher_name=user.last_name, task_name=task,
+                                      student_id=student_id, student_name=student_name,task_grade=grade)
                 entry.save()
                 return JsonResponse({'status': 'ok'})
             else:
@@ -270,6 +267,7 @@ def add_grades_to_students(request):
         except:
             return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
     return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)
+
 
 def add_new_task(request):
     if request.method == "POST":
@@ -283,20 +281,19 @@ def add_new_task(request):
                     teacher = True
                     break
             if teacher:
-                json_data = json.loads((request.body).decode('utf-8'))
+                json_data = json.loads(request.body.decode('utf-8'))
                 subject_id = json_data["subject_id"]
                 subject_name = json_data["subject"]
                 new_task = json_data["task"]
 
-                entry = Tasks.objects(subject_id=subject_id, subject_name=subject_name,
-                                                teacher_id=user.id, teacher_name=user.last_name, task_name=new_task)
-                entry.save()
-                return JsonResponse({'status': 'ok', 'task_id': entry.id})
+                entry = Tasks.new(int(subject_id), subject_name, user.id,
+                                  user.last_name, new_task)
+                return JsonResponse({'status': 'ok', 'task_id': str(entry.id)})
             else:
                 JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
         except:
-            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
-    return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)
+            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=400)
+    return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=404)
 
 
 def add_new_subject(request):
@@ -310,66 +307,62 @@ def add_new_subject(request):
                 if x.codename == "can_publish_subjects":
                     teacher = True
                     break
-
             if teacher:
-                json_data = json.loads((request.body).decode('utf-8'))
+                json_data = json.loads(request.body.decode('utf-8'))
                 new_subject = json_data["subject"]
-
-                entry = Subjects.objects(subject_id=id, subject_name=new_subject,
-                                                teacher_id=user.id, teacher_name=user.last_name)
-                entry.save()
-                return JsonResponse({'status': 'ok', 'subject_id': entry.subject_id})
+                entry = Subjects.new(new_subject, user.id, user.last_name)
+                return JsonResponse({'status': 'ok', 'subject_id': str(entry.id)})
             else:
                 JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
         except:
             return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
     return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)
 
-def login(request):
+
+def check_login(request):
     if request.method == "POST":
-        json_data = json.loads((request.body).decode('utf-8'))
-        new_login = json_data["username"]
-        new_password = json_data["password"]
-        entry = User.objects.filter(username=new_login, password=new_password).first()
-        if entry:
+        token = request.META["HTTP_AUTHORIZATION"]
+        try:
+            tok = Token.objects.get(key=token)
+            user = tok.user
             teacher = False
-            tok = Token.objects.get(user=entry)
-            for x in Permission.objects.filter(user=entry):
+            for x in Permission.objects.filter(user=user):
                 if x.codename == "can_publish_subjects":
                     teacher = True
                     break
+
             if teacher:
                 data_subjects = {}
                 data_task = {}
 
-                subjects = Subjects.objects.filter(teacher_id=entry.id)
+                subjects = Subjects.objects.filter(teacher_id=user.id)
                 for subject in subjects:
-                    data_subjects[subject.subject_id] = subject.subject_name
-                    tasks = Tasks.objects.filter(subject_id=subject.subject_id)
-                    data_task[subject.subject_id] = {}
+                    data_subjects[str(subject.id)] = subject.subject_name
+                    tasks = Tasks.objects.filter(subject_id=subject.id)
+                    data_task[str(subject.id)] = {}
 
                     for task in tasks:
-                        data_task[subject.subject_id][task.id] = task.task_name
-
+                        data_task[str(subject.id)][str(task.id)] = task.task_name
 
                 data = {}
                 for some in subjects:
-                    each_task = Student_Grade.objects.filter(subject_id=some.subject_id)
-                    data[some.subject_id] = {}
+                    each_task = StudentGrade.objects.filter(subject_id=some.id)
+                    data[str(some.id)] = {}
                     for line in each_task:
-                        data[some.subject_id][line.task_name] = []
-                        data[some.subject_id][line.task_name].append([line.student_id,
-                                                                      line.student_name, line.task_grade])
-
-                # data_students = {}
-                # for task in tasks:
-                #     data_students[task.task_name] = (task.student_name, task.task_grade)
+                        print(some.subject_name)
+                        print(line.student_name)
+                        print("___")
+                        data[str(some.id)][line.task_name] = []
+                        data[str(some.id)][line.task_name].append(
+                                [str(line.student_id), line.student_name, str(line.task_grade)])
 
                 perm = Permission.objects.get(codename='can_read_subjects')
                 all_students = User.objects.filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).distinct()
                 data_all_students = {}
                 for person in all_students:
-                    data_all_students[person.id] = (person.first_name, person.last_name)
+                    data_all_students[str(person.id)] = [person.first_name, person.last_name]
+
+                print(data) # grade wasnt saved and not all users are dicplayes
 
                 return JsonResponse({'status': 'ok', 'is_teacher': 'true', 'token': tok.key,
                                      'data_subjects': data_subjects,
@@ -379,21 +372,24 @@ def login(request):
 
             else:
                 data_subject_student = {}
-                subjects = Student_Subject.objects.filter(student_id=entry.id)
+                subjects = StudentSubject.objects.filter(student_id=user.id)
                 for each in subjects:
-                    data_subject_student[each.subject_id] = each.subject_name
+                    data_subject_student[str(each.id)] = each.subject_name
 
                 data_task_student = {}
                 for each_one in subjects:
-                    tasks = Student_Grade.objects.filter(subject_id=each_one.subject_id)
-                    data_task_student[each_one.subject_id] = {}
+                    tasks = StudentGrade.objects.filter(subject_id=each_one.id)
+                    data_task_student[str(each_one.id)] = {}
                     for each in tasks:
-                        data_task_student[each_one.subject_id][each.task_name] = each.task_grade
+                        data_task_student[str(each_one.id)][each.task_name] = str(each.task_grade)
 
                 return JsonResponse({'status': 'ok', 'token': tok.key, 'is_teacher': 'false',
                                      'data_subject_student': data_subject_student,
                                      'data_task_student': data_task_student})
+        except:
+            return JsonResponse({'status': 'false', 'message': 'user does not exist'}, status=404)
     return JsonResponse({'status': 'false', 'message': 'execution did not start'}, status=404)
+
 
 def change_task(request):
     if request.method == "POST":
@@ -407,19 +403,19 @@ def change_task(request):
                     teacher = True
                     break
             if teacher:
-                json_data = json.loads((request.body).decode('utf-8'))
+                json_data = json.loads(request.body.decode('utf-8'))
                 subject_id = json_data["subject_id"]
                 old_task_name = json_data["old_task_name"]
                 new_task_name = json_data["new_task_name"]
 
                 entries_for_task = Tasks.objects.filter(subject_id=subject_id,
-                                                teacher_id=user.id, task_name=old_task_name)
+                                                        teacher_id=user.id, task_name=old_task_name)
                 for entry in entries_for_task:
                     entry.task_name = new_task_name
                     entry.save()
 
-                entries_for_grades = Student_Grade(subject_id=subject_id,
-                                                teacher_id=user.id, task_name=old_task_name)
+                entries_for_grades = StudentGrade.objects.filter(subject_id=subject_id,
+                                                                  teacher_id=user.id, task_name=old_task_name)
 
                 for entry in entries_for_grades:
                     entry.task_name = new_task_name
@@ -431,6 +427,7 @@ def change_task(request):
         except:
             return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
     return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)
+
 
 def change_subject(request):
     if request.method == "POST":
@@ -444,7 +441,7 @@ def change_subject(request):
                     teacher = True
                     break
             if teacher:
-                json_data = json.loads((request.body).decode('utf-8'))
+                json_data = json.loads(request.body.decode('utf-8'))
                 subject_id = json_data["subject_id"]
                 subject_name = json_data["subject_name"]
 
@@ -453,7 +450,7 @@ def change_subject(request):
                     entry.subject_name = subject_name
                     entry.save()
 
-                entries_for_sstudent_ubject = Student_Subject.objects.filter(subject_id=subject_id, teacher_id=user.id)
+                entries_for_sstudent_ubject = StudentSubject.objects.filter(subject_id=subject_id, teacher_id=user.id)
                 for entry in entries_for_sstudent_ubject:
                     entry.subject_name = subject_name
                     entry.save()
@@ -463,7 +460,7 @@ def change_subject(request):
                     entry.subject_name = subject_name
                     entry.save()
 
-                entries_for_grades = Student_Grade(subject_id=subject_id, teacher_id=user.id)
+                entries_for_grades = StudentGrade(subject_id=subject_id, teacher_id=user.id)
                 for entry in entries_for_grades:
                     entry.subject_name = subject_name
                     entry.save()
@@ -474,6 +471,7 @@ def change_subject(request):
         except:
             return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
     return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)
+
 
 def change_grade(request):
     if request.method == "POST":
@@ -492,11 +490,10 @@ def change_grade(request):
                 task_name = json_data["task_name"]
                 user_grade = json_data["user_grade"]
                 student_id = json_data["student_id"]
-
-                entries_for_grade = Student_Grade.objects.filter(subject_id=subject_id, teacher_id=user.id,
-                                                                 student_id=student_id, task_name=task_name)
+                entries_for_grade = StudentGrade.objects.filter(subject_id=int(subject_id), teacher_id=user.id,
+                                                                student_id=int(student_id), task_name=task_name)
                 for entry in entries_for_grade:
-                    entry.user_grade = user_grade
+                    entry.user_grade = int(user_grade)
                     entry.save()
 
                 return JsonResponse({'status': 'ok'})
@@ -505,6 +502,7 @@ def change_grade(request):
         except:
             return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
     return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)
+
 
 def add_student_in_subject(request):
     if request.method == "POST":
@@ -518,40 +516,32 @@ def add_student_in_subject(request):
                     teacher = True
                     break
             if teacher:
-                json_data = json.loads((request.body).decode('utf-8'))
+                json_data = json.loads(request.body.decode('utf-8'))
                 subject_id = json_data["subject_id"]
                 students_id = json_data["students_id"]
-                fetch_subject_id = Subjects.objects.filter(subject_id=subject_id).first()
+                subject_name = json_data["subject_name"]
 
                 for student in students_id:
 
-                    fetch_users_name = User.objects.filter(id=student).filrst()
-                    new_student_subject = Student_Subject.objects(student_id=student,
-                                                                  student_name=fetch_users_name.last_name,
-                                                                  subject_id=subject_id,
-                                                                  subject_name=fetch_subject_id.subject_name,
-                                                                  teacher_id=user.id, teacher_name=user.last_name)
-                    new_student_subject.save()
-
-                    fetch_tasks = Tasks.objects.filter(subject_id=subject_id)
+                    fetch_users_name = User.objects.get(id=int(student))
+                    new_student_subject = StudentSubject.new(int(student),
+                                                             fetch_users_name.last_name,
+                                                             int(subject_id),
+                                                             subject_name,
+                                                             user.id,
+                                                             user.last_name)
+                    fetch_tasks = Tasks.objects.filter(subject_id=int(subject_id))
                     for task in fetch_tasks:
-                        new_student_grade = Student_Grade.objects(student_id=student,
-                                                                  student_name=fetch_users_name.last_name,
-                                                                  subject_id=subject_id,
-                                                                  subject_name=fetch_subject_id.subject_name,
-                                                                  teacher_id=user.id,
-                                                                  teacher_name=user.last_name,
-                                                                  task_name=task.task_name,
-                                                                  task_grade=0)
-                        new_student_grade.save()
-
-
+                        new_student_grade = StudentGrade.new(int(student), fetch_users_name.last_name,
+                                                             int(subject_id), subject_name, user.id,
+                                                             user.last_name, task.task_name, 0)
                 return JsonResponse({'status': 'ok'})
             else:
-                JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
+                JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=404)
         except:
-            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
+            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=400)
     return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)
+
 
 def remove_student_from_subject(request):
     if request.method == "POST":
@@ -565,24 +555,23 @@ def remove_student_from_subject(request):
                     teacher = True
                     break
             if teacher:
-                json_data = json.loads((request.body).decode('utf-8'))
+                json_data = json.loads(request.body.decode('utf-8'))
                 subject_id = json_data["subject_id"]
                 students_id = json_data["students_id"]
-
                 for student in students_id:
-                    student_subject = Student_Subject.objects.filter(student_id=student,
-                                                                     subject_id=subject_id)
+                    student_subject = StudentSubject.objects.filter(student_id=int(student),
+                                                                    subject_id=int(subject_id))
                     for each_student in student_subject:
                         each_student.delete()
 
-                    students_grades = Student_Grade.objects.filter(student_id=student,
-                                                                   subject_id=subject_id)
+                    students_grades = StudentGrade.objects.filter(student_id=int(student),
+                                                                  subject_id=int(subject_id))
                     for each_grade in students_grades:
                         each_grade.delete()
 
                 return JsonResponse({'status': 'ok'})
             else:
-                JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
+                JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=404)
         except:
-            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=500)
+            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=400)
     return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)

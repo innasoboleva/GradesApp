@@ -23,7 +23,7 @@ class ViewController: UIViewController {
     // MARK: navigation
     
     @IBAction func unwindToMainView(sender: UIStoryboardSegue) {
-        if let sourceViewController = sender.source as? RegisterTableViewController{
+        if let sourceViewController = sender.source as? RegistrationViewController{
             var teacher = String()
             if sourceViewController.isTeacher.isOn == true {
                 teacher = "true"
@@ -48,26 +48,52 @@ class ViewController: UIViewController {
                 if let responseJSON = responseJSON as? [String: Any] {
                     print(responseJSON)
                     self.raw_token = responseJSON["token"] as? String
+                    
+                    if teacher == "true" {
+                        let story = UIStoryboard(name: "Teacher", bundle: nil)
+                        guard let nextController = story.instantiateInitialViewController() else {
+                            assertionFailure("Unable to load teacher view controller")
+                            return
+                        }
+                        if let navigationController = nextController as? UINavigationController,
+                            let teacherSubjectController = navigationController.topViewController as? TeacherSubjectsTableViewController {
+                            
+                            teacherSubjectController.raw_token = self.raw_token
+                            // person.id: (person.first_name, person.last_name)
+                            teacherSubjectController.all_students_data = (responseJSON["all_students"] as? [String: [String]])!
+                        }
+                        self.present(nextController, animated: true, completion: nil)
+                    } else {
+                        
+                        let story = UIStoryboard(name: "Student", bundle: nil)
+                        guard let nextController = story.instantiateInitialViewController() else {
+                            assertionFailure("Unable to load student view controller")
+                            return
+                        }
+                        if let navigationController = nextController as? UINavigationController,
+                            let studentSubjectController = navigationController.topViewController as? StudentSubjectTableViewController {
+                            
+                            studentSubjectController.raw_token = self.raw_token
+                        }
+                        self.present(nextController, animated: true, completion: nil)
+                    }
                 }
             }
-            
             task.resume()
-            
-            if sourceViewController.isTeacher.isOn == true {
-                //loadPage("Teacher")
-            } else {
-                //loadPage("Student")
-            }
         }
+    }
+    
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        super.prepare(for: segue, sender: sender)
     }
     
     // MARK: private method
     private func login() {
-        
-        let json: [String: Any] = ["password": passwordText.text, "username": loginText.text]
+        let json: [String: String] = ["password": passwordText.text!, "username": loginText.text!]
         let jsonData = try? JSONSerialization.data(withJSONObject: json)
         // post request to get info about user
-        let url = URL(string: "http://127.0.0.1:8000/polls/login/")!
+        let url = URL(string: "http://127.0.0.1:8000/polls/get_auth_token/")!
         var request = URLRequest(url: url)
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
@@ -80,53 +106,101 @@ class ViewController: UIViewController {
             }
             let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
             if let responseJSON = responseJSON as? [String: Any] {
+                if let token = responseJSON["token"] as? String {
+                    self.raw_token = token
                 
-                self.raw_token = responseJSON["token"] as? String
-                if responseJSON["is_teacher"] as! String? == "true" {
-                    
-                    let data_subjects = responseJSON["data_subjects"] as! [String: String]
-                    let data_tasks = responseJSON["data_task"] as! [String: [String]]
-                    let all_data = responseJSON["all_data"] as! [String: [String: [String]]]
-                    let all_students = responseJSON["all_students"] as! [String: (String, String)]
-                    
+                // post request to get info about user
+                let url2 = URL(string: "http://127.0.0.1:8000/polls/check_login/")!
+                var request2 = URLRequest(url: url2)
+                request2.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                request2.addValue(self.raw_token!, forHTTPHeaderField: "Authorization")
+                request2.httpMethod = "POST"
+
+                let task2 = URLSession.shared.dataTask(with: request2) { data2, response2, error2 in
+                    guard let data2 = data2, error2 == nil else {
+                        print(error?.localizedDescription ?? "No data")
+                        return
+                    }
+                    let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                    if let responseJSON2 = responseJSON2 as? [String: Any] {
+
+                        if responseJSON2["status"] as? String == "ok" {
+
+                            // self.raw_token = responseJSON2["token"] as? String
+                            if responseJSON2["is_teacher"] as! String? == "true" {
+
+                                let data_subjects = responseJSON2["data_subjects"] as! [String: String]
+                                let data_tasks = responseJSON2["data_task"] as! [String: [String: String]]
+                                let all_data = responseJSON2["all_data"] as! [String: [String: [[String]]]]
+                                let all_students = responseJSON2["all_students"] as! [String: [String]]
+
+                                let story = UIStoryboard(name: "Teacher", bundle: nil)
+                                guard let nextController = story.instantiateInitialViewController() else {
+                                    assertionFailure("Unable to load teacher view controller")
+                                    return
+                                }
+                                if let navigationController = nextController as? UINavigationController,
+                                    let teacherSubjectController = navigationController.topViewController as? TeacherSubjectsTableViewController {
+
+                                    teacherSubjectController.raw_token = self.raw_token
+                                    teacherSubjectController.data_subjects = data_subjects
+                                    teacherSubjectController.data_tasks = data_tasks
+                                    teacherSubjectController.all_data = all_data
+                                    teacherSubjectController.all_students_data = all_students
+                                    
+                                    OperationQueue.main.addOperation {
+                                        self.present(nextController, animated: true, completion: nil)
+                                }
+                                
+                                }
+                            }
+                            else {
+
+                                let story = UIStoryboard(name: "Student", bundle: nil)
+                                guard let nextController = story.instantiateInitialViewController() else {
+                                    assertionFailure("Unable to load student view controller")
+                                    return
+                                }
+                                if let navigationController = nextController as? UINavigationController,
+                                    let studentSubjectController = navigationController.topViewController as? StudentSubjectTableViewController {
+
+                                    studentSubjectController.raw_token = self.raw_token
+                                    if let data_subjects = responseJSON2["data_subject_student"] as? [String: String] {
+                                        studentSubjectController.data_subjects = data_subjects
+                                    }
+                                    if let data_grades = responseJSON2["data_task_student"] as? [String: [String: String]] {
+                                        studentSubjectController.data_grades = data_grades
+                                    }
+                                    
+                                    
+                                    OperationQueue.main.addOperation {
+                                        self.present(nextController, animated: true, completion: nil)
+                                }
+                                
+                                }
+                            }
+                        }
+                        else {
+                            let alertController = UIAlertController(title: "No user was found", message: "Incorrect login or password, please try again.", preferredStyle: UIAlertControllerStyle.alert)
+
+                            let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
+                            alertController.addAction(okAction)
+                            self.present(alertController, animated: true, completion: nil)
+                        }
+
+                    }
                 }
-                else {
+                task2.resume()
+                } else {
+                    let alertController = UIAlertController(title: "No token", message: "Could not access your page, please try again.", preferredStyle: UIAlertControllerStyle.alert)
                     
-                    let data_subjects = responseJSON["data_subject_student"] as! [String: String]
-                    let data_grades = responseJSON["data_task_student"] as! [String: [String: String]]
+                    let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
+                    alertController.addAction(okAction)
+                    self.present(alertController, animated: true, completion: nil)
                 }
-                
             }
         }
-        
         task.resume()
-        
-    }
-    
-    private func loadPage(_ name: String, subjects: Any?, tasks: Any?, all_data: Any?, all_students: Any?) {
-        let story = UIStoryboard(name: name, bundle: nil)
-        
-        guard let nextController = story.instantiateInitialViewController() else {
-            assertionFailure("Unable to load teacher view controller")
-            return
-        }
-        if let navigationController = nextController as? UINavigationController,
-            let teacherSubjectController = navigationController.topViewController as? TeacherSubjectsTableViewController {
-            
-            var data_subjects = ["Astronomy", "Data Science", "Math", "Education", "Physics"]
-            var data_tasks = [["Planets", "Mercury", "Asteroids"],["Programming"], ["Logarithm", "Squares"], [],["Laws of nature"]]
-            var data_students = [["Anna","Maria","Inna"],
-                                 ["Alex"],
-                                 ["Alex", "Inna"],
-                                 ["James", "Jacob"],
-                                 ["Inna","Alex"]]
-            var all_students = ["Inna", "Alex", "Maria", "Tony", "Carla", "Jamie", "Anna", "James", "Jacob"]
-            var students_grades = [[[Int]]]()
-            
-            //teacherSubjectController.data_subjects
-            
-        }
-        present(nextController, animated: true, completion: nil)
     }
     
     override func viewDidLoad() {
