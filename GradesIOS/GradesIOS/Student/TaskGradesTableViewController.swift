@@ -51,9 +51,10 @@ class TaskGradesTableViewController: UITableViewController {
             fatalError("The dequeued cell is not an instance of TaskGradesTableViewCell.")
         }
         // Fetches the appropriate subject for the data source layout.
-        let grade_string = tasks_to_show[tasks[indexPath.row]]!
-        cell.taskName.text = tasks[indexPath.row]
-        cell.grade.text = grades[Int(grade_string)!]
+        let current_task = tasks[indexPath.row]
+        cell.taskName.text = current_task
+        let current_grade = Int(tasks_to_show[current_task]!)
+        cell.grade.text = grades[current_grade!]
         
         return cell
     }

@@ -14,12 +14,20 @@ class StudentSubjectTableViewController: UITableViewController {
     var raw_token: String?
     var data_subjects = [String: String]() // id:name
     var data_grades = [String: [String: String]]() // subject_id: [task_name: task_grade]
-    
     var subjects = [String]()
     
-//    var subjects = ["Astronomy", "Math", "Pysics", "Astrology", "Literature"]
-//    var tasks = [["Stars", "Asteroids", "Meteors"], ["Logarithm"], ["One"], ["Two"], ["Three"]]
-//    var grades = [["A", "B", "C"], ["A"],["A"], ["B"], ["B"]]
+    // actions
+    @IBAction func logout(_ sender: Any) {
+        let story = UIStoryboard(name: "Main", bundle: nil)
+        guard let nextController = story.instantiateInitialViewController() else {
+            assertionFailure("Unable to load main view controller")
+            return
+        }
+        OperationQueue.main.addOperation {
+            self.present(nextController, animated: true, completion: nil)
+        }
+    }
+    
     
     // navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -34,8 +42,8 @@ class StudentSubjectTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
         subjects = Array(data_subjects.keys)
+        
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
 

@@ -46,7 +46,6 @@ class ViewController: UIViewController {
                 }
                 let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                 if let responseJSON = responseJSON as? [String: Any] {
-                    print(responseJSON)
                     self.raw_token = responseJSON["token"] as? String
                     
                     if teacher == "true" {
@@ -59,7 +58,6 @@ class ViewController: UIViewController {
                             let teacherSubjectController = navigationController.topViewController as? TeacherSubjectsTableViewController {
                             
                             teacherSubjectController.raw_token = self.raw_token
-                            // person.id: (person.first_name, person.last_name)
                             teacherSubjectController.all_students_data = (responseJSON["all_students"] as? [String: [String]])!
                         }
                         self.present(nextController, animated: true, completion: nil)
@@ -126,7 +124,6 @@ class ViewController: UIViewController {
 
                         if responseJSON2["status"] as? String == "ok" {
 
-                            // self.raw_token = responseJSON2["token"] as? String
                             if responseJSON2["is_teacher"] as! String? == "true" {
 
                                 let data_subjects = responseJSON2["data_subjects"] as! [String: String]
@@ -155,7 +152,6 @@ class ViewController: UIViewController {
                                 }
                             }
                             else {
-
                                 let story = UIStoryboard(name: "Student", bundle: nil)
                                 guard let nextController = story.instantiateInitialViewController() else {
                                     assertionFailure("Unable to load student view controller")

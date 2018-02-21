@@ -45,7 +45,13 @@
                             <outlet property="delegate" destination="Vey-8s-ctL" id="Kio-3W-NPA"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="5l5-8u-ESQ"/>
+                    <navigationItem key="navigationItem" id="5l5-8u-ESQ">
+                        <barButtonItem key="rightBarButtonItem" title="Log out" id="hqW-U3-9si">
+                            <connections>
+                                <action selector="logout:" destination="Vey-8s-ctL" id="eAl-Ae-lNI"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="0DI-dh-cjI" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

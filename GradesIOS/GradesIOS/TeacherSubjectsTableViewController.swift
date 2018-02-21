@@ -33,6 +33,17 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
     @IBOutlet weak var editButton: UIBarButtonItem!
     
     //MARK: Actions
+    @IBAction func logout(_ sender: Any) {
+        let story = UIStoryboard(name: "Main", bundle: nil)
+        guard let nextController = story.instantiateInitialViewController() else {
+            assertionFailure("Unable to load main view controller")
+            return
+        }
+        OperationQueue.main.addOperation {
+            self.present(nextController, animated: true, completion: nil)
+        }
+    }
+    
     
     @IBAction func unwindToSubjectsList(sender: UIStoryboardSegue) {
         if let sourceViewController = sender.source as? NewSubjectViewController,

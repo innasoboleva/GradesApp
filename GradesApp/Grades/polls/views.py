@@ -372,16 +372,15 @@ def check_login(request):
 
             else:
                 data_subject_student = {}
+                data_task_student = {}
                 subjects = StudentSubject.objects.filter(student_id=user.id)
                 for each in subjects:
-                    data_subject_student[str(each.id)] = each.subject_name
+                    data_subject_student[str(each.subject_id)] = each.subject_name
+                    data_task_student[str(each.subject_id)] = {}
 
-                data_task_student = {}
-                for each_one in subjects:
-                    tasks = StudentGrade.objects.filter(subject_id=each_one.id)
-                    data_task_student[str(each_one.id)] = {}
-                    for each in tasks:
-                        data_task_student[str(each_one.id)][each.task_name] = str(each.task_grade)
+                    tasks = StudentGrade.objects.filter(subject_id=each.subject_id)
+                    for each_task in tasks:
+                        data_task_student[str(each.subject_id)][each_task.task_name] = str(each_task.task_grade)
 
                 return JsonResponse({'status': 'ok', 'token': tok.key, 'is_teacher': 'false',
                                      'data_subject_student': data_subject_student,
