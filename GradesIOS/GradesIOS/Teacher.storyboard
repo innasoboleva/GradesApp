@@ -321,7 +321,7 @@
                             <rect key="frame" x="0.0" y="108" width="375" height="44"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                             <items>
-                                <barButtonItem systemItem="add" id="J1f-TV-e3G">
+                                <barButtonItem systemItem="edit" id="J1f-TV-e3G">
                                     <connections>
                                         <segue destination="3Ey-bW-NhF" kind="presentation" identifier="AddStudents" id="ka0-GS-BBs"/>
                                     </connections>

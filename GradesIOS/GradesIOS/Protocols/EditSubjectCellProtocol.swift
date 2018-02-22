@@ -10,6 +10,6 @@ import UIKit
 
 protocol EditSubjectCellProtocol {
     
-    func changeCell (_ cell: UITableViewCell, atIndex: Int, name: String)
+    func changeCell (atIndex: Int, name: String)
     
 }

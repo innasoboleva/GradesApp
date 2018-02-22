@@ -11,7 +11,7 @@ import os.log
 
 class EditTasksTableViewController: UITableViewController, EditSubjectCellProtocol {
     // protocol EditSubjectCellProtocol
-    func changeCell(_ cell: UITableViewCell, atIndex: Int, name: String) {
+    func changeCell(atIndex: Int, name: String) {
         let newIndexPath = IndexPath(row: atIndex, section: 0)
         let new_task = Task(uid: list_of_tasks[atIndex].uid, name: name)
         list_of_tasks[atIndex] = new_task!

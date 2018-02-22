@@ -18,7 +18,7 @@ class EditTasksTableViewCell: UITableViewCell, UITextFieldDelegate {
     
     // MARK: actions    
     @IBAction func didEditCell(_ sender: UITextField) {
-        self.delegating?.changeCell(self, atIndex: indexNum, name: taskName.text!)
+        self.delegating?.changeCell(atIndex: indexNum, name: taskName.text!)
     }
     
     override func awakeFromNib() {

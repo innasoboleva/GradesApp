@@ -574,3 +574,83 @@ def remove_student_from_subject(request):
         except:
             return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=400)
     return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=500)
+
+
+def remove_subject(request):
+    if request.method == "POST":
+        token = request.META["HTTP_AUTHORIZATION"]
+        try:
+            tok = Token.objects.get(key=token)
+            user = tok.user
+            teacher = False
+            for x in Permission.objects.filter(user=user):
+                if x.codename == "can_publish_subjects":
+                    teacher = True
+                    break
+
+            if teacher:
+                json_data = json.loads(request.body.decode('utf-8'))
+                subject_id = json_data["subject_id"]
+
+                subjects = Subjects.objects.filter(teacher_id=user.id, id=int(subject_id))
+                if subjects.exists():
+                    for i in subjects:
+                        i.delete()
+
+                students_subject = StudentSubject.objects.filter(teacher_id=user.id, subject_id=int(subject_id))
+                if students_subject.exists():
+                    for subj in students_subject:
+                        subj.delete()
+
+                tasks = Tasks.objects.filter(teacher_id=user.id, subject_id=int(subject_id))
+                if tasks.exists():
+                    for task in tasks:
+                        task.delete()
+
+                grades = StudentGrade.objects.filter(teacher_id=user.id, subject_id=int(subject_id))
+                if grades.exists():
+                    for grade in grades:
+                        grade.delete()
+
+                return JsonResponse({'status': 'ok'})
+
+            else:
+                return JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
+        except:
+            return JsonResponse({'status': 'false', 'message': 'user does not exist'}, status=400)
+    return JsonResponse({'status': 'false', 'message': 'execution did not start'}, status=404)
+
+
+def remove_task(request):
+    if request.method == "POST":
+        token = request.META["HTTP_AUTHORIZATION"]
+        try:
+            tok = Token.objects.get(key=token)
+            user = tok.user
+            teacher = False
+            for x in Permission.objects.filter(user=user):
+                if x.codename == "can_publish_subjects":
+                    teacher = True
+                    break
+
+            if teacher:
+                json_data = json.loads(request.body.decode('utf-8'))
+                subject_id = json_data["subject_id"]
+                task_name = json_data["task_name"]
+
+                tasks = Tasks.objects.filter(teacher_id=user.id, subject_id=int(subject_id), task_name=task_name)
+                if tasks.exists():
+                    for task in tasks:
+                        task.delete()
+                grades = StudentGrade.objects.filter(teacher_id=user.id, subject_id=int(subject_id),
+                                                     task_name=task_name)
+                if grades.exists():
+                    for grade in grades:
+                        grade.delete()
+                return JsonResponse({'status': 'ok'})
+
+            else:
+                return JsonResponse({'status': 'false', 'message': 'not a teacher'}, status=500)
+        except:
+            return JsonResponse({'status': 'false', 'message': 'user does not exist'}, status=400)
+    return JsonResponse({'status': 'false', 'message': 'execution did not start'}, status=404)

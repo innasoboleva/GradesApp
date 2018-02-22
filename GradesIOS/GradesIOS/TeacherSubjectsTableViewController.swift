@@ -219,7 +219,9 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.tableView.allowsMultipleSelectionDuringEditing = false
         tableView.delegate = self
+        tableView.dataSource = self
 
         loadData()
         
@@ -271,25 +273,60 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
 //    }
  
 
-    /*
+    
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         // Return false if you do not want the specified item to be editable.
         return true
     }
-    */
+    
 
-    /*
+    
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
+        if (editingStyle == UITableViewCellEditingStyle.delete) {
+            // deleting subject
+            let old_task = tasks.removeValue(forKey: subjects[indexPath.row])
+            let old_dict = dict.removeValue(forKey: subjects[indexPath.row])
+            let removed_subject = subjects.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+            
+            let json: [String: Any] = ["subject_id": removed_subject.uid]
+            let jsonData = try? JSONSerialization.data(withJSONObject: json)
+            // post request to delete subject in database
+            let url = URL(string: "http://127.0.0.1:8000/polls/remove_subject/")!
+            var request = URLRequest(url: url)
+            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
+            request.httpMethod = "POST"
+            request.httpBody = jsonData
+            
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                guard let data = data, error == nil else {
+                    print(error?.localizedDescription ?? "No data")
+                    return
+                }
+                let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                if let responseJSON = responseJSON as? [String: Any] {
+                    
+                    if responseJSON["status"] as? String != "ok" {
+                        let alertController = UIAlertController(title: "Error", message: "Could not delete \(removed_subject.name) subject, please try again.", preferredStyle: UIAlertControllerStyle.alert)
+                        
+                        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
+                        alertController.addAction(okAction)
+                        self.present(alertController, animated: true, completion: nil)
+                        
+                        self.subjects.append(removed_subject)
+                        self.tasks[removed_subject] = old_task
+                        self.dict[removed_subject] = old_dict
+                        tableView.reloadData()
+                    }
+                }
+            }
+            task.resume()
+        }
     }
-    */
+    
 
     /*
     // Override to support rearranging the table view.

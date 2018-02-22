@@ -24,4 +24,9 @@ urlpatterns = [
 
     path('add_student/', views.add_student_in_subject, name='add_student'),
     path('remove_student/', views.remove_student_from_subject, name='remove_student'),
+
+    path('remove_subject/', views.remove_subject, name='remove_subject'),
+    path('remove_task/', views.remove_task, name='remove_task'),
+
+
 ]
