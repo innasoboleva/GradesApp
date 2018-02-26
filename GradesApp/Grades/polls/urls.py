@@ -28,5 +28,8 @@ urlpatterns = [
     path('remove_subject/', views.remove_subject, name='remove_subject'),
     path('remove_task/', views.remove_task, name='remove_task'),
 
+    #path('check_login_token/', views.check_login_token, name='check_login_token'),
+
+
 
 ]

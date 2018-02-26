@@ -106,7 +106,17 @@ class ViewController: UIViewController {
             if let responseJSON = responseJSON as? [String: Any] {
                 if let token = responseJSON["token"] as? String {
                     self.raw_token = token
+ //                   NSLog("\(self.raw_token)")
                 
+                    
+//                    // token authentification in django
+//                    let url2 = URL(string: "http://127.0.0.1:8000/polls/check_login_token/")!
+//                    var request2 = URLRequest(url: url2)
+//                    request2.addValue("application/json", forHTTPHeaderField: "Content-Type")
+//                    request2.addValue("Token \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+//                    request2.httpMethod = "POST"
+                    
+                    
                 // post request to get info about user
                 let url2 = URL(string: "http://127.0.0.1:8000/polls/check_login/")!
                 var request2 = URLRequest(url: url2)
@@ -181,7 +191,11 @@ class ViewController: UIViewController {
 
                             let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
                             alertController.addAction(okAction)
-                            self.present(alertController, animated: true, completion: nil)
+                            
+                            OperationQueue.main.addOperation {
+                                self.present(alertController, animated: true, completion: nil)
+                            }
+                            
                         }
 
                     }

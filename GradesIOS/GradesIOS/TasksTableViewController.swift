@@ -204,12 +204,31 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
             
         } 
         else if let sourceViewController = sender.source as? EditTasksTableViewController {
-            var counter = 0
+            var counter = 0 // update view then send info to database if wrong get error message
+            let old_tasks = self.tasks
+            let old_dict_tasks = self.dict_tasks
+            var save_error = false
             for each_task in sourceViewController.list_of_tasks {
                 if tasks[counter] != each_task {
-
+                    // for keeping Dict instance up to date with the changes
+                    if let value_dict = self.dict_tasks.removeValue(forKey: self.tasks[counter]) {
+                        self.dict_tasks[each_task] = value_dict
+                    }
+                    // keeping cells up to date
+                    self.tasks[counter] = each_task
+                }
+                counter += 1
+            }
+            tableView.reloadData()
+            counter = 0
+            for each_task in sourceViewController.list_of_tasks {
+                if old_tasks[counter] != each_task {
+                    var sub_id = String()
+                    if let subjects_id = subject?.uid {
+                        sub_id = String(describing: subjects_id)
+                    }
                     // for keeping database correct
-                    let json: [String: Any] = ["subject_id": String(describing: self.subject?.uid), "old_task_name": tasks[counter].name, "new_task_name": each_task.name]
+                    let json: [String: Any] = ["subject_id": sub_id, "old_task_name": old_tasks[counter].name, "new_task_name": each_task.name]
                     let jsonData = try? JSONSerialization.data(withJSONObject: json)
                     // post request to change task in a database
                     let url = URL(string: "http://127.0.0.1:8000/polls/change_task/")!
@@ -227,26 +246,28 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                         let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                         if let responseJSON = responseJSON as? [String: Any] {
                             
-                            if responseJSON["status"] as? String == "ok" {
+                            if responseJSON["status"] as? String != "ok" {
                                 
-                                // for keeping Dict instance up to date with the changes
-                                if let value_dict = self.dict_tasks.removeValue(forKey: self.tasks[counter]) {
-                                    self.dict_tasks[each_task] = value_dict
-                                }
+                                let alertController = UIAlertController(title: "Error", message: "Could not change task names, please try again.", preferredStyle: UIAlertControllerStyle.alert)
                                 
-                                // keeping cells up to date
-                                self.tasks[counter] = each_task
-                            } else {
-                                // Unable to change task
-                                print(error?.localizedDescription ?? "Unable to change task in a database")
+                                let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
+                                alertController.addAction(okAction)
+                                self.present(alertController, animated: true, completion: nil)
+                                
+                                self.tasks = old_tasks
+                                self.dict_tasks = old_dict_tasks
+                                save_error = true
+                                self.tableView.reloadData()
                             }
                         }
                     }
                     task.resume()
                 }
+                if save_error {
+                    break
+                }
                 counter += 1
             }
-            tableView.reloadData()
         }
         else if let sourceViewController = sender.source as? StudentGradesTableViewController {
             let new_users_grades = sourceViewController.user_grades

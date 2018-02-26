@@ -98,11 +98,30 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
             
         } else if let sourceViewController = sender.source as? EditSubjectTableViewController {
             var counter = 0
+            let old_subjects = self.subjects
+            let old_dict = self.dict
+            let old_task = self.tasks
+            var save_error = false
             for each_subject in sourceViewController.list_of_subjects {
-                if each_subject != self.subjects[counter] {
-                    
+                if subjects[counter] != each_subject {
+                    // for keeping Dict instance up to date with the changes
+                    if let value_dict = self.dict.removeValue(forKey: self.subjects[counter]) {
+                        self.dict[each_subject] = value_dict
+                    }
+                    if let value_task = self.tasks.removeValue(forKey: self.subjects[counter]) {
+                        self.tasks[each_subject] = value_task
+                    }
+                    // keeping cells up to date
+                    self.subjects[counter] = each_subject
+                }
+                counter += 1
+            }
+            tableView.reloadData()
+            counter = 0
+            for each_subject in sourceViewController.list_of_subjects {
+                if each_subject != old_subjects[counter] {
                     // for keeping database correct
-                    let json: [String: Any] = ["subject_id": String(describing: self.subjects[counter].uid), "subject_name": each_subject.name]
+                    let json: [String: Any] = ["subject_id": old_subjects[counter].uid, "subject_name": each_subject.name]
                     let jsonData = try? JSONSerialization.data(withJSONObject: json)
                     // post request to add new subject to database
                     let url = URL(string: "http://127.0.0.1:8000/polls/change_subject/")!
@@ -120,26 +139,30 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                         let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                         if let responseJSON = responseJSON as? [String: Any] {
                             
-                            if responseJSON["status"] as? String == "ok" {
+                            if responseJSON["status"] as? String != "ok" {
                                 
-                                // for keeping Dict instance up to date with the changes
-                                if let value_dict = self.dict.removeValue(forKey: self.subjects[counter]) {
-                                    self.dict[each_subject] = value_dict
-                                }
-                                // keeping cells up to date
-                                self.subjects[counter] = each_subject
+                                let alertController = UIAlertController(title: "Error", message: "Could not change class name, please try again.", preferredStyle: UIAlertControllerStyle.alert)
                                 
-                            } else {
-                                // Unable to change subject
-                                print(error?.localizedDescription ?? "Unable to change subject name in a database")
+                                let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
+                                alertController.addAction(okAction)
+                                self.present(alertController, animated: true, completion: nil)
+                                
+                                self.subjects = old_subjects
+                                self.dict = old_dict
+                                self.tasks = old_task
+                                save_error = true
+                                self.tableView.reloadData()
+                                
                             }
                         }
                     }
                     task.resume()
                 }
+                if save_error {
+                    break
+                }
                 counter += 1
             }
-            tableView.reloadData()
         }
     }
     

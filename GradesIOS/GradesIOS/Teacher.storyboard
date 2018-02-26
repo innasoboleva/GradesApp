@@ -272,8 +272,10 @@
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <textInputTraits key="textInputTraits"/>
                                             <connections>
+                                                <action selector="cellShouldReturn:" destination="2X2-VH-rSM" eventType="editingDidEndOnExit" id="U7K-oe-Bgb"/>
                                                 <action selector="didEditCell:" destination="2X2-VH-rSM" eventType="editingChanged" id="GLU-fe-BGw"/>
-                                                <action selector="didFinishEditingCell:" destination="2X2-VH-rSM" eventType="editingDidEnd" id="6YZ-jk-U0x"/>
+                                                <action selector="didEndEditing:" destination="2X2-VH-rSM" eventType="editingDidEnd" id="7Mx-YI-aH2"/>
+                                                <action selector="didEndOnExit:" destination="2X2-VH-rSM" eventType="editingDidEndOnExit" id="zhp-HN-1OF"/>
                                             </connections>
                                         </textField>
                                     </subviews>
@@ -472,6 +474,7 @@
                                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                             <textInputTraits key="textInputTraits"/>
                                             <connections>
+                                                <action selector="testEdited:" destination="oyu-Do-kcq" eventType="editingChanged" id="yp6-BC-9py"/>
                                                 <action selector="textFieldDidEndEditing:" destination="oyu-Do-kcq" eventType="editingDidEnd" id="nX3-IV-4QU"/>
                                             </connections>
                                         </textField>

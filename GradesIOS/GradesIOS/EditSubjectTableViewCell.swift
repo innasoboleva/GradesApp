@@ -21,10 +21,13 @@ class EditSubjectTableViewCell: UITableViewCell, UITextFieldDelegate {
 
         // Initialization code
     }
-    
 
+    @IBAction func testEdited(_ sender: UITextField) {
+        self.delegating?.changeCell(atIndex: indexNum, name: subjectText.text!)
+    }
+    
     @IBAction func textFieldDidEndEditing(_ sender: UITextField) {
-        self.delegating?.changeCell(self, atIndex: indexNum, name: subjectText.text!)
+        self.delegating?.changeCell(atIndex: indexNum, name: subjectText.text!)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {

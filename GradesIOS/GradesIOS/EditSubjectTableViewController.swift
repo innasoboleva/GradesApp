@@ -11,11 +11,9 @@ import os.log
 
 class EditSubjectTableViewController: UITableViewController, EditSubjectCellProtocol {
     // protocol EditSubjectCellProtocol
-    func changeCell(_ cell: UITableViewCell, atIndex: Int, name: String) {
-        let newIndexPath = IndexPath(row: atIndex, section: 0)
+    func changeCell(atIndex: Int, name: String) {
         let newSubject = Subject(uid: list_of_subjects[atIndex].uid, name: name)
         list_of_subjects[atIndex] = newSubject!
-        tableView.reloadRows(at: [newIndexPath], with: .automatic)
     }
     
     // MARK: properties
