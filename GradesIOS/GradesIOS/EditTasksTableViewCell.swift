@@ -14,8 +14,6 @@ class EditTasksTableViewCell: UITableViewCell, UITextFieldDelegate {
     weak var delegating: EditTasksTableViewController?
     var indexNum = Int()
     @IBOutlet weak var taskName: UITextField!
-
-    //private var currentTextField: UITextField?
     
     // MARK: actions    
     @IBAction func didEditCell(_ sender: UITextField) {

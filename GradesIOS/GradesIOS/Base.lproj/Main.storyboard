@@ -18,42 +18,42 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="f0d-Ju-xZ0">
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="f0d-Ju-xZ0">
                                 <rect key="frame" x="20" y="50" width="335" height="261"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="   Your login:" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NZm-em-zyi">
-                                        <rect key="frame" x="0.0" y="0.0" width="335" height="20.5"/>
+                                        <rect key="frame" x="120.5" y="0.0" width="94" height="20.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="2x8-O7-pvf">
-                                        <rect key="frame" x="0.0" y="40.5" width="335" height="30"/>
+                                        <rect key="frame" x="30" y="40.5" width="275" height="30"/>
                                         <nil key="textColor"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="   Your password:" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lhr-D4-jjY">
-                                        <rect key="frame" x="0.0" y="90.5" width="335" height="20.5"/>
+                                        <rect key="frame" x="102.5" y="90.5" width="130.5" height="20.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="gh3-TS-Yo2">
-                                        <rect key="frame" x="0.0" y="131" width="335" height="30"/>
+                                        <rect key="frame" x="30" y="131" width="275" height="30"/>
                                         <nil key="textColor"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uFO-TN-oz8">
-                                        <rect key="frame" x="0.0" y="181" width="335" height="30"/>
+                                        <rect key="frame" x="139" y="181" width="57" height="30"/>
                                         <state key="normal" title="Register"/>
                                         <connections>
                                             <segue destination="KO9-7s-6n1" kind="presentation" id="ZPc-bP-40f"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="W2B-8s-VSO">
-                                        <rect key="frame" x="0.0" y="231" width="335" height="30"/>
+                                        <rect key="frame" x="145.5" y="231" width="44" height="30"/>
                                         <state key="normal" title="Check"/>
                                         <connections>
                                             <action selector="checkUserButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ZPh-VR-QWW"/>
@@ -61,7 +61,11 @@
                                     </button>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="300" id="y5H-ua-DAQ"/>
+                                    <constraint firstAttribute="trailing" secondItem="2x8-O7-pvf" secondAttribute="trailing" constant="30" id="EEE-Xd-njv"/>
+                                    <constraint firstItem="gh3-TS-Yo2" firstAttribute="leading" secondItem="f0d-Ju-xZ0" secondAttribute="leading" constant="30" id="Omt-7Z-kms"/>
+                                    <constraint firstItem="2x8-O7-pvf" firstAttribute="leading" secondItem="f0d-Ju-xZ0" secondAttribute="leading" constant="30" id="SHp-Vj-82F"/>
+                                    <constraint firstAttribute="height" constant="300" id="Udw-1x-UpY"/>
+                                    <constraint firstAttribute="trailing" secondItem="gh3-TS-Yo2" secondAttribute="trailing" constant="30" id="nTI-cD-VgH"/>
                                 </constraints>
                             </stackView>
                         </subviews>

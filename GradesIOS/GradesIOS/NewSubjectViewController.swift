@@ -15,10 +15,6 @@ class NewSubjectViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var saveButton: UIButton!
     @IBOutlet weak var newSubjectName: UITextField!
     
-    //var raw_token: String?
-//    var subject: Subject?
-    //var data_saved: Bool?
-    
     // MARK: navigation
     @IBAction func cancel(_ sender: UIBarButtonItem) {
         dismiss(animated: true, completion: nil)
@@ -34,45 +30,6 @@ class NewSubjectViewController: UIViewController, UITextFieldDelegate {
             os_log("The save button was not pressed, cancelling", log: OSLog.default, type: .debug)
             return
         }
-        
-//        let name = newSubjectName.text ?? ""
-//        if newSubjectName.text != nil {
-//
-//            let json: [String: Any] = ["subject": name]
-//            let jsonData = try? JSONSerialization.data(withJSONObject: json)
-//            // post request to add new subject to database
-//            let url = URL(string: "http://127.0.0.1:8000/polls/add_new_subject/")!
-//            var request = URLRequest(url: url)
-//            request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-//            request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
-//            request.httpMethod = "POST"
-//            request.httpBody = jsonData
-//
-//            let task = URLSession.shared.dataTask(with: request) { data, response, error in
-//                guard let data = data, error == nil else {
-//                    print(error?.localizedDescription ?? "No data")
-//                    return
-//                }
-//                let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
-//                if let responseJSON = responseJSON as? [String: Any] {
-//
-//                    if responseJSON["status"] as? String == "ok" {
-//                        if let subject_id = responseJSON["subject_id"] as? String {
-//                            let id = Int(subject_id)
-//                            self.subject = Subject(uid: id!, name: name)
-//                            //self.data_saved = true
-//                        }
-//                    } else {
-//                        let alertController = UIAlertController(title: "Error", message: "Could not add new subject, please try again.", preferredStyle: UIAlertControllerStyle.alert)
-//
-//                        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
-//                        alertController.addAction(okAction)
-//                        self.present(alertController, animated: true, completion: nil)
-//                    }
-//                }
-//            }
-//            task.resume()
-//        }
     }
     
     override func viewDidLoad() {

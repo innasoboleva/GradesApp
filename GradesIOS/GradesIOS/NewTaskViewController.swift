@@ -15,11 +15,6 @@ class NewTaskViewController: UIViewController {
     @IBOutlet weak var newTaskName: UITextField!
     @IBOutlet weak var addTaskButton: UIButton!
     
-//    var subject: Subject?
-//    var task: Task?
-//    var raw_token: String?
-//    var data_saved: Bool?
-    
     // MARK: - Navigation
     
     @IBAction func cancel(_ sender: UIBarButtonItem) {
@@ -34,10 +29,6 @@ class NewTaskViewController: UIViewController {
             os_log("The save button was not pressed, cancelling", log: OSLog.default, type: .debug)
             return
         }
-        
-        //let name = newTaskName.text ?? ""
-        
-        
     }
     
     override func viewDidLoad() {

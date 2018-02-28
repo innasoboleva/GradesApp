@@ -24,7 +24,6 @@ class StudentGradesTableViewController: UITableViewController, ReturnGrade  {
     var current_task: Task?
     var all_students = [User]()
     var user_grades = [User: Int]()
-    var raw_token: String?
     // for displaying tableview controller
     struct Users {
         var user_name : String

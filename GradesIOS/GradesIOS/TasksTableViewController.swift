@@ -26,13 +26,13 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
         }
         
         // for keeping database up to date
-        let json: [String: Any] = ["subject_id": sub_id, "subject_name": subject?.name, "students_id": students_added_array]
+        let json: [String: Any] = ["subject_id": sub_id, "subject_name": subject?.name as Any, "students_id": students_added_array]
         let jsonData = try? JSONSerialization.data(withJSONObject: json)
         // post request to change students in a database
         let url = URL(string: "http://127.0.0.1:8000/polls/add_student/")!
         var request = URLRequest(url: url)
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
+        request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
         request.httpMethod = "POST"
         request.httpBody = jsonData
         
@@ -53,7 +53,6 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                             self.dict_tasks[key]![user] = 0
                         }
                     }
-                    
                     // adding students first then removing
                     let json_remove: [String: Any] = ["subject_id": sub_id, "students_id": students_removed_array]
                     let jsonDataRemove = try? JSONSerialization.data(withJSONObject: json_remove)
@@ -61,7 +60,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     let url_remove = URL(string: "http://127.0.0.1:8000/polls/remove_student/")!
                     var request_remove = URLRequest(url: url_remove)
                     request_remove.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                    request_remove.addValue(self.raw_token!, forHTTPHeaderField: "Authorization")
+                    request_remove.addValue("Token \(self.raw_token!)", forHTTPHeaderField: "Authorization")
                     request_remove.httpMethod = "POST"
                     request_remove.httpBody = jsonDataRemove
                     
@@ -81,9 +80,77 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                         let _ = self.dict_tasks[key]!.removeValue(forKey: user)
                                     }
                                 }
-                            } else {
+                            } else if responseJSON["status"] as? String == "not exist" {
+                                
+                                // if tasks do not exist - no need to execute, no students records
+                                if self.tasks.count > 0 {
+                                    
+                                    DispatchQueue.main.async {
+                                        
+                                        let jsonStudents: [String: Any] = ["subject_id": sub_id, "task_name": self.tasks[0].name]
+                                        let jsonDataStudents = try? JSONSerialization.data(withJSONObject: jsonStudents)
+                                        // post request to get users
+                                        let urlStudents = URL(string: "http://127.0.0.1:8000/polls/get_students/")!
+                                        var requestStudents = URLRequest(url: urlStudents)
+                                        requestStudents.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                                        requestStudents.addValue("Token \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+                                        requestStudents.httpMethod = "POST"
+                                        requestStudents.httpBody = jsonDataStudents
+                                        
+                                        let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
+                                            guard let data2 = data2, error2 == nil else {
+                                                print(error2?.localizedDescription ?? "No data")
+                                                return
+                                            }
+                                            let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                            if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                
+                                                if responseJSON2["status"] as? String == "ok" {
+                                                    // id, name
+                                                    let new_user_list = responseJSON2["users"] as? [[String]]
+                                                    
+                                                    var new_users = [User: Int]()
+                                                    for each_user in new_user_list! {
+                                                        let new_student = User(uid: Int(each_user[0])!,
+                                                                               name: each_user[1])
+                                                        // make a dictionary
+                                                        new_users[new_student!] = 1
+                                                    }
+                                                    
+                                                    let old_users = self.dict_tasks[self.tasks[0]]?.keys
+                                                    for each_old_user in old_users! {
+                                                        if let _ = new_users[each_old_user] {
+                                                            continue
+                                                        }
+                                                        else {
+                                                            // delete users from main dictionary
+                                                            let keys_in_dict = self.dict_tasks.keys
+                                                            for key in keys_in_dict {
+                                                                let _ = self.dict_tasks[key]?.removeValue(forKey: each_old_user)
+                                                            }
+                                                        }
+                                                    }
+                                                    
+                                                }
+                                            }
+                                        }
+                                        taskStudents.resume()
+                                    }
+                                }
+                                
+                                
+                                
+                            }
+                            else {
                                 // Unable to remove students in a database
                                 print(error?.localizedDescription ?? "Unable to remove students in a database")
+                                let alertController = UIAlertController(title: "Error", message: "Could not add/remove students in a list, please try again.", preferredStyle: UIAlertControllerStyle.alert)
+                                
+                                let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
+                                alertController.addAction(okAction)
+                                OperationQueue.main.addOperation {
+                                    self.present(alertController, animated: true, completion: nil)
+                                }
                             }
                         }
                     }
@@ -92,6 +159,13 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                 } else {
                     // Unable to add students in a database
                     print(error?.localizedDescription ?? "Unable to add students in a database")
+                    let alertController = UIAlertController(title: "Error", message: "Could not add/remove students in a list, please try again.", preferredStyle: UIAlertControllerStyle.alert)
+                    
+                    let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
+                    alertController.addAction(okAction)
+                    OperationQueue.main.addOperation {
+                        self.present(alertController, animated: true, completion: nil)
+                    }
                 }
             }
         }
@@ -115,13 +189,13 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
             
             if !(new_task.isEmpty) {
                 
-                let json: [String: Any] = ["task": new_task, "subject_id": String(subject!.uid), "subject": subject?.name]
+                let json: [String: Any] = ["task": new_task, "subject_id": String(subject!.uid), "subject": subject?.name as Any]
                 let jsonData = try? JSONSerialization.data(withJSONObject: json)
                 // post request to add new task to database
                 let url = URL(string: "http://127.0.0.1:8000/polls/add_new_task/")!
                 var request = URLRequest(url: url)
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
+                request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
                 request.httpMethod = "POST"
                 request.httpBody = jsonData
                 
@@ -164,13 +238,13 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                 }
                                 
                                 if users_exist {
-                                    let json_grades: [String: Any] = ["task": new_task, "subject_id": String(self.subject!.uid), "subject": self.subject?.name, "task_with_data": users_exist_in_task?.name]
+                                    let json_grades: [String: Any] = ["task": new_task, "subject_id": String(self.subject!.uid), "subject": self.subject?.name as Any, "task_with_data": users_exist_in_task?.name]
                                     let jsonDataGrades = try? JSONSerialization.data(withJSONObject: json_grades)
                                     // post request to add new grades to database
                                     let url_grades = URL(string: "http://127.0.0.1:8000/polls/add_grades/")!
                                     var request_grades = URLRequest(url: url_grades)
                                     request_grades.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                                    request_grades.addValue(self.raw_token!, forHTTPHeaderField: "Authorization")
+                                    request_grades.addValue("Token \(self.raw_token!)", forHTTPHeaderField: "Authorization")
                                     request_grades.httpMethod = "POST"
                                     request_grades.httpBody = jsonDataGrades
                                     let task_grade = URLSession.shared.dataTask(with: request_grades) { data2, response2, error2 in
@@ -196,6 +270,14 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                 }
                             }
                             
+                        } else {
+                            let alertController = UIAlertController(title: "Error", message: "Could not add new assignment, please try again.", preferredStyle: UIAlertControllerStyle.alert)
+                            
+                            let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
+                            alertController.addAction(okAction)
+                            OperationQueue.main.addOperation {
+                                self.present(alertController, animated: true, completion: nil)
+                            }
                         }
                     }
                 }
@@ -234,7 +316,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     let url = URL(string: "http://127.0.0.1:8000/polls/change_task/")!
                     var request = URLRequest(url: url)
                     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                    request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
+                    request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
                     request.httpMethod = "POST"
                     request.httpBody = jsonData
                     
@@ -272,9 +354,8 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
         else if let sourceViewController = sender.source as? StudentGradesTableViewController {
             let new_users_grades = sourceViewController.user_grades
             let current_task = sourceViewController.current_task
-            let old_users_grades = dict_tasks[current_task!]?.keys
             let dict_keys = new_users_grades.keys
-            
+            //var save_error = false
             // for sending subject_id as a String
             var sub_id = String()
             if let subjects_id = subject?.uid {
@@ -295,7 +376,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     let url = URL(string: "http://127.0.0.1:8000/polls/change_grade/")!
                     var request = URLRequest(url: url)
                     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                    request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
+                    request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
                     request.httpMethod = "POST"
                     request.httpBody = jsonData
                     
@@ -310,13 +391,75 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                             if responseJSON["status"] as? String == "ok" {
                                 
                                 // for keeping Dict instance up to date with the changes
-                                if let value_for_user = self.dict_tasks[current_task!]!.removeValue(forKey: key)
+                                if let _ = self.dict_tasks[current_task!]!.removeValue(forKey: key)
                                 {
                                     self.dict_tasks[current_task!]![key] = new_users_grades[key]
                                 }
-                            } else {
-                                // Unable to change user's grade
-                                print(error?.localizedDescription ?? "Unable to change user's grade in a database")
+                            } else if responseJSON["status"] as? String == "not exist" {
+                                // Unable to change user's grade - reload current "all users"
+                                print(error?.localizedDescription ?? "Unable to change user's grade in a database, no user with id \(key.uid)")
+                                
+                                DispatchQueue.main.async {
+                                // reload all current students
+                                let jsonStudents: [String: Any] = ["subject_id": sub_id, "task_name": current_task!.name]
+                                let jsonDataStudents = try? JSONSerialization.data(withJSONObject: jsonStudents)
+                                // post request to get users
+                                let urlStudents = URL(string: "http://127.0.0.1:8000/polls/get_students/")!
+                                var requestStudents = URLRequest(url: urlStudents)
+                                requestStudents.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                                requestStudents.addValue("Token \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+                                requestStudents.httpMethod = "POST"
+                                requestStudents.httpBody = jsonDataStudents
+                                
+
+                                let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
+                                    guard let data2 = data2, error2 == nil else {
+                                        print(error2?.localizedDescription ?? "No data")
+                                        return
+                                    }
+                                    let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                    if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                        
+                                        if responseJSON2["status"] as? String == "ok" {
+                                            // id, name
+                                            let new_user_list = responseJSON2["users"] as? [[String]]
+                                            
+                                            var new_users = [User: Int]()
+                                            for each_user in new_user_list! {
+                                                let new_student = User(uid: Int(each_user[0])!,
+                                                                       name: each_user[1])
+                                                // make a dictionary
+                                                new_users[new_student!] = 1
+                                            }
+                                            
+                                            let old_users = self.dict_tasks[current_task!]?.keys
+                                            for each_old_user in old_users! {
+                                                if let _ = new_users[each_old_user] {
+                                                    continue
+                                                }
+                                                else {
+                                                    // delete users from main dictionary
+                                                    let keys_in_dict = self.dict_tasks.keys
+                                                    for key in keys_in_dict {
+                                                        let _ = self.dict_tasks[key]?.removeValue(forKey: each_old_user)
+                                                    }
+                                                }
+                                            }
+                                            
+                                        }
+                                    }
+                                }
+                                taskStudents.resume()
+                                }
+                                
+                                let alertController = UIAlertController(title: "Error", message: "Could not change student's grades, please try again.", preferredStyle: UIAlertControllerStyle.alert)
+                                
+                                let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
+                                alertController.addAction(okAction)
+                                OperationQueue.main.addOperation {
+                                    self.present(alertController, animated: true, completion: nil)
+                                }
+                                
                             }
                         }
                     }
@@ -338,7 +481,6 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                 toViewController.all_students = self.all_students
                 toViewController.subject = self.subject
                 toViewController.current_task = self.tasks[tableView.indexPathForSelectedRow!.row]
-                toViewController.raw_token = self.raw_token
                 toViewController.delegating = self
                 
             } else {
@@ -426,7 +568,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
             let url = URL(string: "http://127.0.0.1:8000/polls/remove_task/")!
             var request = URLRequest(url: url)
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
+            request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
             request.httpMethod = "POST"
             request.httpBody = jsonData
             

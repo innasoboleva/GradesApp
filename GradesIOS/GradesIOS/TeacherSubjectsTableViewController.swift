@@ -56,7 +56,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                 let url = URL(string: "http://127.0.0.1:8000/polls/add_new_subject/")!
                 var request = URLRequest(url: url)
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
+                request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
                 request.httpMethod = "POST"
                 request.httpBody = jsonData
                 
@@ -85,11 +85,13 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                                 
                             }
                         } else {
-                            let alertController = UIAlertController(title: "Error", message: "Could not add new subject, please try again.", preferredStyle: UIAlertControllerStyle.alert)
+                            let alertController = UIAlertController(title: "Error", message: "Could not add new class, please try again.", preferredStyle: UIAlertControllerStyle.alert)
                             
                             let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
                             alertController.addAction(okAction)
-                            self.present(alertController, animated: true, completion: nil)
+                            OperationQueue.main.addOperation {
+                                self.present(alertController, animated: true, completion: nil)
+                            }
                         }
                     }
                 }
@@ -127,7 +129,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                     let url = URL(string: "http://127.0.0.1:8000/polls/change_subject/")!
                     var request = URLRequest(url: url)
                     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                    request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
+                    request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
                     request.httpMethod = "POST"
                     request.httpBody = jsonData
                     
@@ -152,7 +154,6 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                                 self.tasks = old_task
                                 save_error = true
                                 self.tableView.reloadData()
-                                
                             }
                         }
                     }
@@ -320,7 +321,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
             let url = URL(string: "http://127.0.0.1:8000/polls/remove_subject/")!
             var request = URLRequest(url: url)
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.addValue(raw_token!, forHTTPHeaderField: "Authorization")
+            request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
             request.httpMethod = "POST"
             request.httpBody = jsonData
             

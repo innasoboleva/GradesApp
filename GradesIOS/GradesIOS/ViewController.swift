@@ -30,7 +30,7 @@ class ViewController: UIViewController {
             } else {
                 teacher = "false"
             }
-            let json: [String: Any] = ["password": sourceViewController.passwordText.text, "username": sourceViewController.usernameText.text, "email":sourceViewController.emailText.text, "first_name": sourceViewController.firstName.text, "last_name": sourceViewController.lastName.text, "is_teacher": teacher]
+            let json: [String: Any] = ["password": sourceViewController.passwordText.text as Any, "username": sourceViewController.usernameText.text as Any, "email":sourceViewController.emailText.text as Any, "first_name": sourceViewController.firstName.text as Any, "last_name": sourceViewController.lastName.text as Any, "is_teacher": teacher]
             let jsonData = try? JSONSerialization.data(withJSONObject: json)
             // post request to register a new user and recieve a token
             let url = URL(string: "http://127.0.0.1:8000/polls/new_user/")!
@@ -106,22 +106,12 @@ class ViewController: UIViewController {
             if let responseJSON = responseJSON as? [String: Any] {
                 if let token = responseJSON["token"] as? String {
                     self.raw_token = token
- //                   NSLog("\(self.raw_token)")
-                
-                    
-//                    // token authentification in django
-//                    let url2 = URL(string: "http://127.0.0.1:8000/polls/check_login_token/")!
-//                    var request2 = URLRequest(url: url2)
-//                    request2.addValue("application/json", forHTTPHeaderField: "Content-Type")
-//                    request2.addValue("Token \(self.raw_token!)", forHTTPHeaderField: "Authorization")
-//                    request2.httpMethod = "POST"
-                    
-                    
+ 
                 // post request to get info about user
                 let url2 = URL(string: "http://127.0.0.1:8000/polls/check_login/")!
                 var request2 = URLRequest(url: url2)
                 request2.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                request2.addValue(self.raw_token!, forHTTPHeaderField: "Authorization")
+                request2.addValue("Token \(self.raw_token!)", forHTTPHeaderField: "Authorization")
                 request2.httpMethod = "POST"
 
                 let task2 = URLSession.shared.dataTask(with: request2) { data2, response2, error2 in
@@ -149,16 +139,15 @@ class ViewController: UIViewController {
                                 if let navigationController = nextController as? UINavigationController,
                                     let teacherSubjectController = navigationController.topViewController as? TeacherSubjectsTableViewController {
 
-                                    teacherSubjectController.raw_token = self.raw_token
-                                    teacherSubjectController.data_subjects = data_subjects
-                                    teacherSubjectController.data_tasks = data_tasks
-                                    teacherSubjectController.all_data = all_data
-                                    teacherSubjectController.all_students_data = all_students
+                                        teacherSubjectController.raw_token = self.raw_token
+                                        teacherSubjectController.data_subjects = data_subjects
+                                        teacherSubjectController.data_tasks = data_tasks
+                                        teacherSubjectController.all_data = all_data
+                                        teacherSubjectController.all_students_data = all_students
                                     
-                                    OperationQueue.main.addOperation {
-                                        self.present(nextController, animated: true, completion: nil)
-                                }
-                                
+                                        OperationQueue.main.addOperation {
+                                            self.present(nextController, animated: true, completion: nil)
+                                    }
                                 }
                             }
                             else {
@@ -177,12 +166,10 @@ class ViewController: UIViewController {
                                     if let data_grades = responseJSON2["data_task_student"] as? [String: [String: String]] {
                                         studentSubjectController.data_grades = data_grades
                                     }
-                                    
-                                    
+
                                     OperationQueue.main.addOperation {
                                         self.present(nextController, animated: true, completion: nil)
-                                }
-                                
+                                    }
                                 }
                             }
                         }
@@ -195,9 +182,7 @@ class ViewController: UIViewController {
                             OperationQueue.main.addOperation {
                                 self.present(alertController, animated: true, completion: nil)
                             }
-                            
                         }
-
                     }
                 }
                 task2.resume()
@@ -206,7 +191,9 @@ class ViewController: UIViewController {
                     
                     let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
                     alertController.addAction(okAction)
-                    self.present(alertController, animated: true, completion: nil)
+                    OperationQueue.main.addOperation {
+                        self.present(alertController, animated: true, completion: nil)
+                    }
                 }
             }
         }
