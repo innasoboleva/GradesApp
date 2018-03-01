@@ -32,7 +32,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
         let url = URL(string: "http://127.0.0.1:8000/polls/add_student/")!
         var request = URLRequest(url: url)
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
+        request.addValue("JWT \(raw_token!)", forHTTPHeaderField: "Authorization")
         request.httpMethod = "POST"
         request.httpBody = jsonData
         
@@ -60,7 +60,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     let url_remove = URL(string: "http://127.0.0.1:8000/polls/remove_student/")!
                     var request_remove = URLRequest(url: url_remove)
                     request_remove.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                    request_remove.addValue("Token \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+                    request_remove.addValue("JWT \(self.raw_token!)", forHTTPHeaderField: "Authorization")
                     request_remove.httpMethod = "POST"
                     request_remove.httpBody = jsonDataRemove
                     
@@ -93,7 +93,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                         let urlStudents = URL(string: "http://127.0.0.1:8000/polls/get_students/")!
                                         var requestStudents = URLRequest(url: urlStudents)
                                         requestStudents.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                                        requestStudents.addValue("Token \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+                                        requestStudents.addValue("JWT \(self.raw_token!)", forHTTPHeaderField: "Authorization")
                                         requestStudents.httpMethod = "POST"
                                         requestStudents.httpBody = jsonDataStudents
                                         
@@ -132,40 +132,37 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                     }
                                                     
                                                 }
+                                                else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                {
+                                                    self.logout()
+                                                }
                                             }
                                         }
                                         taskStudents.resume()
                                     }
                                 }
-                                
-                                
-                                
+                            }
+                            else if responseJSON["detail"] as? String == "Signature has expired."
+                            {
+                                self.logout()
                             }
                             else {
                                 // Unable to remove students in a database
                                 print(error?.localizedDescription ?? "Unable to remove students in a database")
-                                let alertController = UIAlertController(title: "Error", message: "Could not add/remove students in a list, please try again.", preferredStyle: UIAlertControllerStyle.alert)
-                                
-                                let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
-                                alertController.addAction(okAction)
-                                OperationQueue.main.addOperation {
-                                    self.present(alertController, animated: true, completion: nil)
-                                }
+                                self.present_alert("Could not add/remove students in a list, please try again.")
                             }
                         }
                     }
                     task_remove.resume()
                     
-                } else {
+                } else if responseJSON["detail"] as? String == "Signature has expired."
+                {
+                    self.logout()
+                }
+                else {
                     // Unable to add students in a database
                     print(error?.localizedDescription ?? "Unable to add students in a database")
-                    let alertController = UIAlertController(title: "Error", message: "Could not add/remove students in a list, please try again.", preferredStyle: UIAlertControllerStyle.alert)
-                    
-                    let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
-                    alertController.addAction(okAction)
-                    OperationQueue.main.addOperation {
-                        self.present(alertController, animated: true, completion: nil)
-                    }
+                    self.present_alert("Could not add/remove students in a list, please try again.")
                 }
             }
         }
@@ -195,7 +192,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                 let url = URL(string: "http://127.0.0.1:8000/polls/add_new_task/")!
                 var request = URLRequest(url: url)
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
+                request.addValue("JWT \(raw_token!)", forHTTPHeaderField: "Authorization")
                 request.httpMethod = "POST"
                 request.httpBody = jsonData
                 
@@ -244,7 +241,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                     let url_grades = URL(string: "http://127.0.0.1:8000/polls/add_grades/")!
                                     var request_grades = URLRequest(url: url_grades)
                                     request_grades.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                                    request_grades.addValue("Token \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+                                    request_grades.addValue("JWT \(self.raw_token!)", forHTTPHeaderField: "Authorization")
                                     request_grades.httpMethod = "POST"
                                     request_grades.httpBody = jsonDataGrades
                                     let task_grade = URLSession.shared.dataTask(with: request_grades) { data2, response2, error2 in
@@ -263,6 +260,9 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                 for each_user in dict_keys! {
                                                     self.dict_tasks[student_task!]?[each_user] = 0
                                                 }
+                                            } else if responseJSON2["detail"] as? String == "Signature has expired."
+                                            {
+                                                self.logout()
                                             }
                                         }
                                     }
@@ -270,14 +270,12 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                 }
                             }
                             
-                        } else {
-                            let alertController = UIAlertController(title: "Error", message: "Could not add new assignment, please try again.", preferredStyle: UIAlertControllerStyle.alert)
-                            
-                            let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
-                            alertController.addAction(okAction)
-                            OperationQueue.main.addOperation {
-                                self.present(alertController, animated: true, completion: nil)
-                            }
+                        } else if responseJSON["detail"] as? String == "Signature has expired."
+                        {
+                            self.logout()
+                        }
+                        else {
+                            self.present_alert("Could not add new assignment, please try again.")
                         }
                     }
                 }
@@ -316,7 +314,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     let url = URL(string: "http://127.0.0.1:8000/polls/change_task/")!
                     var request = URLRequest(url: url)
                     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                    request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
+                    request.addValue("JWT \(raw_token!)", forHTTPHeaderField: "Authorization")
                     request.httpMethod = "POST"
                     request.httpBody = jsonData
                     
@@ -327,14 +325,12 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                         }
                         let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                         if let responseJSON = responseJSON as? [String: Any] {
-                            
-                            if responseJSON["status"] as? String != "ok" {
-                                
-                                let alertController = UIAlertController(title: "Error", message: "Could not change task names, please try again.", preferredStyle: UIAlertControllerStyle.alert)
-                                
-                                let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
-                                alertController.addAction(okAction)
-                                self.present(alertController, animated: true, completion: nil)
+                            if responseJSON["detail"] as? String == "Signature has expired."
+                            {
+                                self.logout()
+                            }
+                            else if responseJSON["status"] as? String != "ok" {
+                                self.present_alert("Could not change task names, please try again.")
                                 
                                 self.tasks = old_tasks
                                 self.dict_tasks = old_dict_tasks
@@ -376,7 +372,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     let url = URL(string: "http://127.0.0.1:8000/polls/change_grade/")!
                     var request = URLRequest(url: url)
                     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                    request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
+                    request.addValue("JWT \(raw_token!)", forHTTPHeaderField: "Authorization")
                     request.httpMethod = "POST"
                     request.httpBody = jsonData
                     
@@ -395,7 +391,11 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                 {
                                     self.dict_tasks[current_task!]![key] = new_users_grades[key]
                                 }
-                            } else if responseJSON["status"] as? String == "not exist" {
+                            } else if responseJSON["detail"] as? String == "Signature has expired."
+                            {
+                                self.logout()
+                            }
+                            else if responseJSON["status"] as? String == "not exist" {
                                 // Unable to change user's grade - reload current "all users"
                                 print(error?.localizedDescription ?? "Unable to change user's grade in a database, no user with id \(key.uid)")
                                 
@@ -407,7 +407,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                 let urlStudents = URL(string: "http://127.0.0.1:8000/polls/get_students/")!
                                 var requestStudents = URLRequest(url: urlStudents)
                                 requestStudents.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                                requestStudents.addValue("Token \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+                                requestStudents.addValue("JWT \(self.raw_token!)", forHTTPHeaderField: "Authorization")
                                 requestStudents.httpMethod = "POST"
                                 requestStudents.httpBody = jsonDataStudents
                                 
@@ -446,20 +446,15 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                 }
                                             }
                                             
+                                        } else if responseJSON2["detail"] as? String == "Signature has expired."
+                                        {
+                                            self.logout()
                                         }
                                     }
                                 }
                                 taskStudents.resume()
                                 }
-                                
-                                let alertController = UIAlertController(title: "Error", message: "Could not change student's grades, please try again.", preferredStyle: UIAlertControllerStyle.alert)
-                                
-                                let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
-                                alertController.addAction(okAction)
-                                OperationQueue.main.addOperation {
-                                    self.present(alertController, animated: true, completion: nil)
-                                }
-                                
+                                self.present_alert("Could not change student's grades, please try again.")
                             }
                         }
                     }
@@ -568,7 +563,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
             let url = URL(string: "http://127.0.0.1:8000/polls/remove_task/")!
             var request = URLRequest(url: url)
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
+            request.addValue("JWT \(raw_token!)", forHTTPHeaderField: "Authorization")
             request.httpMethod = "POST"
             request.httpBody = jsonData
             
@@ -579,13 +574,12 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                 }
                 let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                 if let responseJSON = responseJSON as? [String: Any] {
-                    
-                    if responseJSON["status"] as? String != "ok" {
-                        let alertController = UIAlertController(title: "Error", message: "Could not delete '\(removed_task.name)' task, please try again.", preferredStyle: UIAlertControllerStyle.alert)
-                        
-                        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
-                        alertController.addAction(okAction)
-                        self.present(alertController, animated: true, completion: nil)
+                    if responseJSON["detail"] as? String == "Signature has expired."
+                    {
+                        self.logout()
+                    }
+                    else if responseJSON["status"] as? String != "ok" {
+                        self.present_alert("Could not delete '\(removed_task.name)' task, please try again.")
                         
                         self.tasks.append(removed_task)
                         self.dict_tasks[removed_task] = old_dict
@@ -594,6 +588,35 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                 }
             }
             task.resume()
+        }
+    }
+    
+    private func logout() {
+        let story = UIStoryboard(name: "Main", bundle: nil)
+        guard let nextController = story.instantiateInitialViewController() else {
+            assertionFailure("Unable to load main view controller")
+            return
+        }
+        
+        let alertController = UIAlertController(title: "Error", message: "Authorization failed. Please, log in again.", preferredStyle: UIAlertControllerStyle.alert)
+        
+        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: {(action) -> Void in
+            self.present(nextController, animated: true)
+        })
+        alertController.addAction(okAction)
+        
+        OperationQueue.main.addOperation {
+            self.present(alertController, animated: true, completion: nil)
+        }
+    }
+    
+    private func present_alert(_ message: String) {
+        let alertController = UIAlertController(title: "Error", message: message, preferredStyle: UIAlertControllerStyle.alert)
+        
+        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
+        alertController.addAction(okAction)
+        OperationQueue.main.addOperation {
+            self.present(alertController, animated: true, completion: nil)
         }
     }
 

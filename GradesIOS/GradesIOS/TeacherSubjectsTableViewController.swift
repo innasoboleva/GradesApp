@@ -56,7 +56,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                 let url = URL(string: "http://127.0.0.1:8000/polls/add_new_subject/")!
                 var request = URLRequest(url: url)
                 request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
+                request.addValue("JWT \(raw_token!)", forHTTPHeaderField: "Authorization")
                 request.httpMethod = "POST"
                 request.httpBody = jsonData
                 
@@ -67,7 +67,6 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                     }
                     let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                     if let responseJSON = responseJSON as? [String: Any] {
-                        
                         if responseJSON["status"] as? String == "ok" {
                             if let subject_id = responseJSON["subject_id"] as? String {
                                 let id = Int(subject_id)
@@ -84,14 +83,11 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                                 }
                                 
                             }
-                        } else {
-                            let alertController = UIAlertController(title: "Error", message: "Could not add new class, please try again.", preferredStyle: UIAlertControllerStyle.alert)
-                            
-                            let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
-                            alertController.addAction(okAction)
-                            OperationQueue.main.addOperation {
-                                self.present(alertController, animated: true, completion: nil)
-                            }
+                        } else if responseJSON["detail"] as? String == "Signature has expired." {
+                           self.logout()
+                        }
+                        else {
+                            self.present_alert("Could not add new class, please try again.")
                         }
                     }
                 }
@@ -129,7 +125,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                     let url = URL(string: "http://127.0.0.1:8000/polls/change_subject/")!
                     var request = URLRequest(url: url)
                     request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                    request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
+                    request.addValue("JWT \(raw_token!)", forHTTPHeaderField: "Authorization")
                     request.httpMethod = "POST"
                     request.httpBody = jsonData
                     
@@ -140,14 +136,12 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                         }
                         let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                         if let responseJSON = responseJSON as? [String: Any] {
-                            
-                            if responseJSON["status"] as? String != "ok" {
-                                
-                                let alertController = UIAlertController(title: "Error", message: "Could not change class name, please try again.", preferredStyle: UIAlertControllerStyle.alert)
-                                
-                                let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
-                                alertController.addAction(okAction)
-                                self.present(alertController, animated: true, completion: nil)
+                            if responseJSON["detail"] as? String == "Signature has expired."
+                            {
+                                self.logout()
+                            }
+                            else if responseJSON["status"] as? String != "ok" {
+                                self.present_alert("Could not change class name, please try again.")
                                 
                                 self.subjects = old_subjects
                                 self.dict = old_dict
@@ -204,6 +198,35 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
             let last = all_students_data[key]![1]
             let new_student = User(uid: new_id!, name: "\(last)")
             all_students.append(new_student!)
+        }
+    }
+    
+    private func logout() {
+        let story = UIStoryboard(name: "Main", bundle: nil)
+        guard let nextController = story.instantiateInitialViewController() else {
+            assertionFailure("Unable to load main view controller")
+            return
+        }
+        
+        let alertController = UIAlertController(title: "Error", message: "Authorization failed. Please, log in again.", preferredStyle: UIAlertControllerStyle.alert)
+        
+        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: {(action) -> Void in
+            self.present(nextController, animated: true)
+        })
+        alertController.addAction(okAction)
+        
+        OperationQueue.main.addOperation {
+            self.present(alertController, animated: true, completion: nil)
+        }
+    }
+    
+    private func present_alert(_ message: String) {
+        let alertController = UIAlertController(title: "Error", message: message, preferredStyle: UIAlertControllerStyle.alert)
+        
+        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
+        alertController.addAction(okAction)
+        OperationQueue.main.addOperation {
+            self.present(alertController, animated: true, completion: nil)
         }
     }
     
@@ -321,7 +344,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
             let url = URL(string: "http://127.0.0.1:8000/polls/remove_subject/")!
             var request = URLRequest(url: url)
             request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.addValue("Token \(raw_token!)", forHTTPHeaderField: "Authorization")
+            request.addValue("JWT \(raw_token!)", forHTTPHeaderField: "Authorization")
             request.httpMethod = "POST"
             request.httpBody = jsonData
             
@@ -332,13 +355,12 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                 }
                 let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                 if let responseJSON = responseJSON as? [String: Any] {
-                    
-                    if responseJSON["status"] as? String != "ok" {
-                        let alertController = UIAlertController(title: "Error", message: "Could not delete \(removed_subject.name) subject, please try again.", preferredStyle: UIAlertControllerStyle.alert)
-                        
-                        let okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.default)
-                        alertController.addAction(okAction)
-                        self.present(alertController, animated: true, completion: nil)
+                    if responseJSON["detail"] as? String == "Signature has expired."
+                    {
+                        self.logout()
+                    }
+                    else if responseJSON["status"] as? String != "ok" {
+                        self.present_alert("Could not delete \(removed_subject.name) subject, please try again.")
                         
                         self.subjects.append(removed_subject)
                         self.tasks[removed_subject] = old_task

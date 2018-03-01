@@ -1,5 +1,4 @@
 # Create your views here.
-from rest_framework.authtoken.models import Token
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
@@ -8,6 +7,7 @@ from rest_framework.decorators import api_view
 from django.http import JsonResponse
 import json
 
+import requests
 from django.db.models import Q
 
 from django.contrib.auth.models import User
@@ -49,7 +49,7 @@ def create_permissions():
         content_type=content_type,
     )
 
-
+# need to obtain new token after and return to user
 def create_new_user(request):
     # If didn't set permissions before, run create_permissions()
     if request.method == "POST":
@@ -85,7 +85,11 @@ def create_new_user(request):
             new_user.user_permissions.add(permission)
 
         new_user.save()
-        token = Token.objects.create(user=new_user)
+        # token
+        r = requests.post('http://127.0.0.1:8000/polls/api-token-auth/', data={'password': new_login,
+                                                                               'username': new_password})
+        data = json.loads(r.text)
+        token = data["token"]
 
         if new_permissions == "true":
             perm = Permission.objects.get(codename='can_read_subjects')
@@ -93,10 +97,10 @@ def create_new_user(request):
             data_all_students = {}
             for person in all_students:
                 data_all_students[person.id] = (person.first_name, person.last_name)
-            data = {"token": token.key, "is_teacher": "true", "all_students": data_all_students}
+            data = {"token": token, "is_teacher": "true", "all_students": data_all_students}
             return JsonResponse(data)
         else:
-            data = {"token": token.key, "is_teacher": "false"}
+            data = {"token": token, "is_teacher": "false"}
             return JsonResponse(data)
     return JsonResponse({'status': 'false', 'message': 'execution did not start'}, status=500)
 
@@ -381,7 +385,7 @@ def remove_student_from_subject(request):
                                                                   subject_id=int(subject_id))
                     for each_grade in students_grades:
                         each_grade.delete()
-                        
+
                 if to_return_error:
                     return JsonResponse({'status': 'not exist', 'message': 'no users with {} id'.format(student)}, status=500)
                 else:
@@ -447,7 +451,7 @@ def remove_subject(request):
 
                 return JsonResponse({'status': 'ok'})
         except:
-            return JsonResponse({'status': 'false', 'message': 'user does not exist'}, status=401)
+            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=401)
     return JsonResponse({'status': 'false', 'message': 'execution did not start'}, status=400)
 
 
@@ -472,7 +476,7 @@ def remove_task(request):
                         grade.delete()
                 return JsonResponse({'status': 'ok'})
         except:
-            return JsonResponse({'status': 'false', 'message': 'user does not exist'}, status=401)
+            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=401)
     return JsonResponse({'status': 'false', 'message': 'execution did not start'}, status=400)
 
 
@@ -493,147 +497,5 @@ def get_students_for_subject(request):
                         all_users.append([str(student.student_id), student.student_name])
                 return JsonResponse({'status': 'ok', 'users': all_users})
         except:
-            return JsonResponse({'status': 'false', 'message': 'user does not exist'}, status=401)
+            return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=401)
     return JsonResponse({'status': 'false', 'message': 'execution did not start'}, status=400)
-
-
-# def load_subjects(request):
-#     if request.method == "GET":
-#         token = request.META["HTTP_AUTHORIZATION"]
-#         try:
-#             tok = Token.objects.get(key=token)
-#             user = tok.user
-#             teacher = False
-#             for x in Permission.objects.filter(user=user):
-#                 if x.codename == "can_publish_subjects":
-#                     teacher = True
-#                     break
-#             try:
-#                 if teacher:
-#                     data_subjects = {}
-#                     subjects = Subjects.objects.filter(teacher_id=user.id)
-#                     for subject in subjects:
-#                         data_subjects[subject.subject_id] = subject.subject_name
-#
-#                     data_task = {}
-#                     tasks = StudentGrade.objects.filter(teacher_id=user.id)
-#                     for task in tasks:
-#                         data_task[task.subject_id] = task.task_name
-#
-#                     data = {}
-#                     for some in subjects:
-#                         each_task = StudentGrade.objects.filter(subject_id=some.subject_id)
-#                         data[some.subject_id] = {}
-#                         for line in each_task:
-#                             data[some.subject_id][line.task_name] = (line.student_name, line.task_grade)
-#
-#                     perm = Permission.objects.get(codename='can_read_subjects')
-#                     all_students = User.objects.filter(Q(groups__permissions=perm) | Q(user_permissions=perm)).distinct()
-#                     data_all_students = {}
-#                     for person in all_students:
-#                         data_all_students[person.id] = (person.first_name, person.last_name)
-#
-#                     return JsonResponse({'status': 'ok', 'token': tok.key, 'data_subjects': data_subjects,
-#                                          'data_task': data_task, 'all_data': data, 'all_students': data_all_students})
-#
-#                 else:
-#                     data_subject_student = {}
-#                     subjects = StudentSubject.objects.filter(student_id=user.id)
-#                     for each in subjects:
-#                         data_subject_student[each.subject_id] = each.subject_name
-#
-#                     data_task_student = {}
-#                     for each_one in subjects:
-#                         tasks = StudentGrade.objects.filter(subject_id=each_one.subject_id)
-#                         data_task_student[each_one.subject_id] = {}
-#                         for each in tasks:
-#                             data_task_student[each.subject_id][each.task_name] = each.task_grade
-#
-#                     return JsonResponse({'status': 'ok', 'token': tok.key,
-#                                          'data_subject_student': data_subject_student,
-#                                          'data_task_student': data_task_student})
-#             except:
-#                 JsonResponse({'status': 'false', 'message': 'check logic'}, status=500)
-#         except:
-#             return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=401)
-#     return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=400)
-#
-#
-# def load_tasks(request):
-#     if request.method == "GET":
-#         token = request.META["HTTP_AUTHORIZATION"]
-#         try:
-#             tok = Token.objects.get(key=token)
-#             user = tok.user
-#             teacher = False
-#             for x in Permission.objects.filter(user=user):
-#                 if x.codename == "can_publish_subjects":
-#                     teacher = True
-#                     break
-#             try:
-#                 if teacher:
-#                     json_data = json.loads(request.body.decode('utf-8'))
-#                     subject_id = json_data["subject_id"]
-#
-#                     data_task = {}
-#                     tasks = StudentGrade.objects.filter(teacher_id=user.id, subject_id=subject_id)
-#                     for task in tasks:
-#                         data_task[task.subject_id] = task.task_name
-#
-#                     data = {}
-#                     each_task = StudentGrade.objects.filter(subject_id=subject_id, teacher_id=user.id)
-#                     for line in each_task:
-#                         data[line.task_name] = (line.student_name, line.task_grade)
-#
-#                     return JsonResponse({'status': 'ok', 'token': tok.key,
-#                                          'data_task': data_task, 'all_data': data})
-#             except:
-#                 return JsonResponse({'status': 'false', 'message': 'check logic'}, status=500)
-#         except:
-#             return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=401)
-#     return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=400)
-#
-#
-# def load_students_grades(request):
-#     if request.method == "GET":
-#         token = request.META["HTTP_AUTHORIZATION"]
-#         try:
-#             tok = Token.objects.get(key=token)
-#             user = tok.user
-#             teacher = False
-#             for x in Permission.objects.filter(user=user):
-#                 if x.codename == "can_publish_subjects":
-#                     teacher = True
-#                     break
-#             try:
-#                 if teacher:
-#                     json_data = json.loads(request.body.decode('utf-8'))
-#                     subject_id = json_data["subject_id"]
-#                     task_name = json_data["task_name"]
-#
-#                     data = {}
-#                     each_task = StudentGrade.objects.filter(subject_id=subject_id,
-#                                                              teacher_id=user.id, task_name=task_name)
-#                     for line in each_task:
-#                         data[line.student_name] = line.task_grade
-#
-#                     return JsonResponse({'status': 'ok', 'token': tok.key,
-#                                          'all_data': data})
-#
-#                 else:
-#                     json_data = json.loads((request.body).decode('utf-8'))
-#                     subject_id = json_data["subject_id"]
-#
-#                     data = {}
-#                     each_task = StudentGrade.objects.filter(subject_id=subject_id,
-#                                                              student_id=user.id)
-#                     for line in each_task:
-#                         data[line.task_name] = line.task_grade
-#
-#                     return JsonResponse({'status': 'ok', 'token': tok.key,
-#                                          'all_data': data})
-#             except:
-#                 JsonResponse({'status': 'false', 'message': 'check logic'}, status=500)
-#         except:
-#             return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=401)
-#     return JsonResponse({'status': 'false', 'message': 'wrong method'}, status=400)

@@ -91,7 +91,7 @@ class ViewController: UIViewController {
         let json: [String: String] = ["password": passwordText.text!, "username": loginText.text!]
         let jsonData = try? JSONSerialization.data(withJSONObject: json)
         // post request to get info about user
-        let url = URL(string: "http://127.0.0.1:8000/polls/get_auth_token/")!
+        let url = URL(string: "http://127.0.0.1:8000/polls/api-token-auth/")!
         var request = URLRequest(url: url)
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
@@ -111,7 +111,7 @@ class ViewController: UIViewController {
                 let url2 = URL(string: "http://127.0.0.1:8000/polls/check_login/")!
                 var request2 = URLRequest(url: url2)
                 request2.addValue("application/json", forHTTPHeaderField: "Content-Type")
-                request2.addValue("Token \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+                request2.addValue("JWT \(self.raw_token!)", forHTTPHeaderField: "Authorization")
                 request2.httpMethod = "POST"
 
                 let task2 = URLSession.shared.dataTask(with: request2) { data2, response2, error2 in
