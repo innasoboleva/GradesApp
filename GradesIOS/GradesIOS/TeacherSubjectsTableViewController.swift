@@ -141,6 +141,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                                 self.logout()
                             }
                             else if responseJSON["status"] as? String != "ok" {
+                                
                                 self.present_alert("Could not change class name, please try again.")
                                 
                                 self.subjects = old_subjects

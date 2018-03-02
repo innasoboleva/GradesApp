@@ -7,7 +7,7 @@ from rest_framework.decorators import api_view
 from django.http import JsonResponse
 import json
 
-import requests
+import requests, time
 from django.db.models import Q
 
 from django.contrib.auth.models import User
@@ -248,7 +248,7 @@ def change_task(request):
                     for entry in entries_for_grades:
                         entry.task_name = new_task_name
                         entry.save()
-
+                time.sleep(10)
                 return JsonResponse({'status': 'ok'})
         except:
             return JsonResponse({'status': 'false', 'message': 'token out of date'}, status=401)

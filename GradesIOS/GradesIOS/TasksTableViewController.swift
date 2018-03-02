@@ -53,6 +53,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                             self.dict_tasks[key]![user] = 0
                         }
                     }
+                    self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
                     // adding students first then removing
                     let json_remove: [String: Any] = ["subject_id": sub_id, "students_id": students_removed_array]
                     let jsonDataRemove = try? JSONSerialization.data(withJSONObject: json_remove)
@@ -80,6 +81,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                         let _ = self.dict_tasks[key]!.removeValue(forKey: user)
                                     }
                                 }
+                                self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
                             } else if responseJSON["status"] as? String == "not exist" {
                                 
                                 // if tasks do not exist - no need to execute, no students records
@@ -130,7 +132,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                             }
                                                         }
                                                     }
-                                                    
+                                                    self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
                                                 }
                                                 else if responseJSON2["detail"] as? String == "Signature has expired."
                                                 {
@@ -177,6 +179,9 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
     var tasks = [Task]()
     var dict_tasks = [Task: [User: Int]]()
     var raw_token: String?
+    var session_tasks = [URLSessionDataTask]()
+//    var waiting = [String]()
+//    var answered = [String:Bool]()
     
     //MARK: Actions
     
@@ -233,9 +238,9 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                         }
                                     }
                                 }
-                                
+                                self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
                                 if users_exist {
-                                    let json_grades: [String: Any] = ["task": new_task, "subject_id": String(self.subject!.uid), "subject": self.subject?.name as Any, "task_with_data": users_exist_in_task?.name]
+                                    let json_grades: [String: Any] = ["task": new_task, "subject_id": String(self.subject!.uid), "subject": self.subject?.name as Any, "task_with_data": users_exist_in_task?.name as Any]
                                     let jsonDataGrades = try? JSONSerialization.data(withJSONObject: json_grades)
                                     // post request to add new grades to database
                                     let url_grades = URL(string: "http://127.0.0.1:8000/polls/add_grades/")!
@@ -260,6 +265,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                 for each_user in dict_keys! {
                                                     self.dict_tasks[student_task!]?[each_user] = 0
                                                 }
+                                                self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
                                             } else if responseJSON2["detail"] as? String == "Signature has expired."
                                             {
                                                 self.logout()
@@ -318,11 +324,16 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     request.httpMethod = "POST"
                     request.httpBody = jsonData
                     
+                    
                     let task = URLSession.shared.dataTask(with: request) { data, response, error in
                         guard let data = data, error == nil else {
+                            self.tasks = old_tasks
+                            self.dict_tasks = old_dict_tasks
                             print(error?.localizedDescription ?? "No data")
+                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
                             return
                         }
+                        
                         let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                         if let responseJSON = responseJSON as? [String: Any] {
                             if responseJSON["detail"] as? String == "Signature has expired."
@@ -330,15 +341,17 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                 self.logout()
                             }
                             else if responseJSON["status"] as? String != "ok" {
-                                self.present_alert("Could not change task names, please try again.")
-                                
-                                self.tasks = old_tasks
-                                self.dict_tasks = old_dict_tasks
-                                save_error = true
-                                self.tableView.reloadData()
+                                    self.present_alert("Could not change task names, please try again.")
+                                    
+                                    self.tasks = old_tasks
+                                    self.dict_tasks = old_dict_tasks
+                                    self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                    save_error = true
+                                    self.tableView.reloadData()
                             }
                         }
                     }
+                    self.session_tasks.append(task)
                     task.resume()
                 }
                 if save_error {
@@ -351,7 +364,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
             let new_users_grades = sourceViewController.user_grades
             let current_task = sourceViewController.current_task
             let dict_keys = new_users_grades.keys
-            //var save_error = false
+            
             // for sending subject_id as a String
             var sub_id = String()
             if let subjects_id = subject?.uid {
@@ -391,6 +404,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                 {
                                     self.dict_tasks[current_task!]![key] = new_users_grades[key]
                                 }
+                                self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
                             } else if responseJSON["detail"] as? String == "Signature has expired."
                             {
                                 self.logout()
@@ -445,7 +459,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                     }
                                                 }
                                             }
-                                            
+                                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
                                         } else if responseJSON2["detail"] as? String == "Signature has expired."
                                         {
                                             self.logout()
@@ -506,7 +520,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+
     }
 
     override func didReceiveMemoryWarning() {
@@ -557,7 +571,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
             let removed_task = tasks.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
             
-            let json: [String: Any] = ["subject_id": subject?.uid, "task_name": removed_task.name]
+            let json: [String: Any] = ["subject_id": subject?.uid as Any, "task_name": removed_task.name]
             let jsonData = try? JSONSerialization.data(withJSONObject: json)
             // post request to delete subject in database
             let url = URL(string: "http://127.0.0.1:8000/polls/remove_task/")!
@@ -583,6 +597,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                         
                         self.tasks.append(removed_task)
                         self.dict_tasks[removed_task] = old_dict
+                        self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
                         tableView.reloadData()
                     }
                 }
@@ -619,7 +634,6 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
             self.present(alertController, animated: true, completion: nil)
         }
     }
-
 
     /*
     // Override to support rearranging the table view.
