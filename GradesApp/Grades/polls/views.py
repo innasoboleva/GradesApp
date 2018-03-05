@@ -203,6 +203,23 @@ def add_new_task(request):
                 subject_name = json_data["subject"]
                 new_task = json_data["task"]
 
+                old_tasks = Tasks.objects.filter(subject_id=int(subject_id), teacher_id=user.id)
+                if old_tasks.exists():
+                    task_name = old_tasks[0].task_name
+                    old_users = StudentGrade.objects.filter(subject_id=int(subject_id), teacher_id=user.id,
+                                                            task_name=task_name)
+                    if old_users.exists():
+                        for each_user in old_users:
+                            grade = StudentGrade.new(
+                                each_user.student_id,
+                                each_user.student_name,
+                                int(subject_id),
+                                each_user.subject_name,
+                                user.id,
+                                each_user.teacher_name,
+                                new_task,
+                                0
+                            )
                 entry = Tasks.new(int(subject_id), subject_name, user.id,
                                   user.last_name, new_task)
                 return JsonResponse({'status': 'ok', 'task_id': str(entry.id)})

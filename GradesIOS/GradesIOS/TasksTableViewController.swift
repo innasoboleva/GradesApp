@@ -38,9 +38,369 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
+                if error?._code == NSURLErrorTimedOut {
+                    self.present_alert("Server is not responding. Please, try again later.")
+                }
+                else if error?._code == NSURLErrorCannotConnectToHost {
+                    self.present_alert("Server is not responding. Please, try again later.")
+                }
+                else if error?._code == NSURLErrorNetworkConnectionLost {
+                    // make second request, if connection was lost - try again
+                    let taskTry = URLSession.shared.dataTask(with: request) { data, response, error in
+                        guard let data = data, error == nil else {
+                            self.present_alert("Please, try again later")
+                            print(error?.localizedDescription ?? "No data")
+                            return
+                        }
+                        
+                        let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                        if let responseJSON = responseJSON as? [String: Any] {
+                            
+                            if responseJSON["status"] as? String == "ok" {
+                                
+                                // for keeping dictionary data up to date with the changes
+                                for user in list_added {
+                                    let dict_keys = self.dict_tasks.keys
+                                    for key in dict_keys {
+                                        self.dict_tasks[key]![user] = 0
+                                    }
+                                }
+                                self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                // adding students first then removing
+                                let json_remove: [String: Any] = ["subject_id": sub_id, "students_id": students_removed_array]
+                                let jsonDataRemove = try? JSONSerialization.data(withJSONObject: json_remove)
+                                // post request to change students in a database
+                                let url_remove = URL(string: "http://127.0.0.1:8000/polls/remove_student/")!
+                                var request_remove = URLRequest(url: url_remove)
+                                request_remove.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                                request_remove.addValue("JWT \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+                                request_remove.httpMethod = "POST"
+                                request_remove.httpBody = jsonDataRemove
+                                
+                                let task_remove = URLSession.shared.dataTask(with: request_remove) { data, response, error in
+                                    guard let data = data, error == nil else {
+                                        if error?._code == NSURLErrorTimedOut {
+                                            self.present_alert("Server is not responding. Please, try again later.")
+                                        }
+                                        else if error?._code == NSURLErrorCannotConnectToHost {
+                                            self.present_alert("Server is not responding. Please, try again later.")
+                                        }
+                                        else if error?._code == NSURLErrorNetworkConnectionLost {
+                                            // make second request, if connection was lost - try again
+                                            
+                                            let task_removeTry = URLSession.shared.dataTask(with: request_remove) { data, response, error in
+                                                guard let data = data, error == nil else {
+                                                    self.present_alert("Please, try again later.")
+                                                    print(error?.localizedDescription ?? "No data")
+                                                    return
+                                                }
+                                                
+                                                let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                                                if let responseJSON = responseJSON as? [String: Any] {
+                                                    
+                                                    if responseJSON["status"] as? String == "ok" {
+                                                        // for keeping Dict instance up to date with the changes
+                                                        for user in list_removed {
+                                                            let dict_keys = self.dict_tasks.keys
+                                                            for key in dict_keys {
+                                                                let _ = self.dict_tasks[key]!.removeValue(forKey: user)
+                                                            }
+                                                        }
+                                                        self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                    } else if responseJSON["status"] as? String == "not exist" {
+                                                        
+                                                        // if tasks do not exist - no need to execute, no students records
+                                                        if self.tasks.count > 0 {
+                                                            
+                                                            DispatchQueue.main.async {
+                                                                
+                                                                let jsonStudents: [String: Any] = ["subject_id": sub_id, "task_name": self.tasks[0].name]
+                                                                let jsonDataStudents = try? JSONSerialization.data(withJSONObject: jsonStudents)
+                                                                // post request to get users
+                                                                let urlStudents = URL(string: "http://127.0.0.1:8000/polls/get_students/")!
+                                                                var requestStudents = URLRequest(url: urlStudents)
+                                                                requestStudents.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                                                                requestStudents.addValue("JWT \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+                                                                requestStudents.httpMethod = "POST"
+                                                                requestStudents.httpBody = jsonDataStudents
+                                                                
+                                                                let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
+                                                                    guard let data2 = data2, error2 == nil else {
+                                                                        if error2?._code == NSURLErrorTimedOut {
+                                                                            self.present_alert("Server is not responding. Please, try again later.")
+                                                                        }
+                                                                        else if error2?._code == NSURLErrorCannotConnectToHost {
+                                                                            self.present_alert("Server is not responding. Please, try again later.")
+                                                                        }
+                                                                        else if error2?._code == NSURLErrorNetworkConnectionLost {
+                                                                            // make second request, if connection was lost - try again
+                                                                            
+                                                                            let taskStudentsTry = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
+                                                                                guard let data2 = data2, error2 == nil else {
+                                                                                    self.present_alert("Please, try again later")
+                                                                                    print(error2?.localizedDescription ?? "No data")
+                                                                                    return
+                                                                                }
+                                                                                let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                                                                if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                                                    
+                                                                                    if responseJSON2["status"] as? String == "ok" {
+                                                                                        // id, name
+                                                                                        let new_user_list = responseJSON2["users"] as? [[String]]
+                                                                                        
+                                                                                        var new_users = [User: Int]()
+                                                                                        for each_user in new_user_list! {
+                                                                                            let new_student = User(uid: Int(each_user[0])!,
+                                                                                                                   name: each_user[1])
+                                                                                            // make a dictionary
+                                                                                            new_users[new_student!] = 1
+                                                                                        }
+                                                                                        
+                                                                                        let old_users = self.dict_tasks[self.tasks[0]]?.keys
+                                                                                        for each_old_user in old_users! {
+                                                                                            if let _ = new_users[each_old_user] {
+                                                                                                continue
+                                                                                            }
+                                                                                            else {
+                                                                                                // delete users from main dictionary
+                                                                                                let keys_in_dict = self.dict_tasks.keys
+                                                                                                for key in keys_in_dict {
+                                                                                                    let _ = self.dict_tasks[key]?.removeValue(forKey: each_old_user)
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                        self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                                                    }
+                                                                                    else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                                                    {
+                                                                                        self.logout()
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            taskStudentsTry.resume()
+                                                                                
+                                                                        }
+                                                                        print(error2?.localizedDescription ?? "No data")
+                                                                        return
+                                                                    }
+                                                                    //actual response
+                                                                    let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                                                    if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                                        
+                                                                        if responseJSON2["status"] as? String == "ok" {
+                                                                            // id, name
+                                                                            let new_user_list = responseJSON2["users"] as? [[String]]
+                                                                            
+                                                                            var new_users = [User: Int]()
+                                                                            for each_user in new_user_list! {
+                                                                                let new_student = User(uid: Int(each_user[0])!,
+                                                                                                       name: each_user[1])
+                                                                                // make a dictionary
+                                                                                new_users[new_student!] = 1
+                                                                            }
+                                                                            
+                                                                            let old_users = self.dict_tasks[self.tasks[0]]?.keys
+                                                                            for each_old_user in old_users! {
+                                                                                if let _ = new_users[each_old_user] {
+                                                                                    continue
+                                                                                }
+                                                                                else {
+                                                                                    // delete users from main dictionary
+                                                                                    let keys_in_dict = self.dict_tasks.keys
+                                                                                    for key in keys_in_dict {
+                                                                                        let _ = self.dict_tasks[key]?.removeValue(forKey: each_old_user)
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                                        }
+                                                                        else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                                        {
+                                                                            self.logout()
+                                                                        }
+                                                                    }
+                                                                }
+                                                                taskStudents.resume()
+                                                            }
+                                                        }
+                                                    }
+                                                    else if responseJSON["detail"] as? String == "Signature has expired."
+                                                    {
+                                                        self.logout()
+                                                    }
+                                                    else {
+                                                        // Unable to remove students in a database
+                                                        print(error?.localizedDescription ?? "Unable to remove students in a database")
+                                                        self.present_alert("Could not add/remove students in a list, please try again.")
+                                                    }
+                                                }
+                                            }
+                                            task_removeTry.resume()
+                                            
+                                        }
+                                        print(error?.localizedDescription ?? "No data")
+                                        return
+                                    }
+                                    // actual response
+                                    let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                                    if let responseJSON = responseJSON as? [String: Any] {
+                                        
+                                        if responseJSON["status"] as? String == "ok" {
+                                            // for keeping Dict instance up to date with the changes
+                                            for user in list_removed {
+                                                let dict_keys = self.dict_tasks.keys
+                                                for key in dict_keys {
+                                                    let _ = self.dict_tasks[key]!.removeValue(forKey: user)
+                                                }
+                                            }
+                                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                        } else if responseJSON["status"] as? String == "not exist" {
+                                            
+                                            // if tasks do not exist - no need to execute, no students records
+                                            if self.tasks.count > 0 {
+                                                
+                                                DispatchQueue.main.async {
+                                                    
+                                                    let jsonStudents: [String: Any] = ["subject_id": sub_id, "task_name": self.tasks[0].name]
+                                                    let jsonDataStudents = try? JSONSerialization.data(withJSONObject: jsonStudents)
+                                                    // post request to get users
+                                                    let urlStudents = URL(string: "http://127.0.0.1:8000/polls/get_students/")!
+                                                    var requestStudents = URLRequest(url: urlStudents)
+                                                    requestStudents.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                                                    requestStudents.addValue("JWT \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+                                                    requestStudents.httpMethod = "POST"
+                                                    requestStudents.httpBody = jsonDataStudents
+                                                    
+                                                    let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
+                                                        guard let data2 = data2, error2 == nil else {
+                                                            if error2?._code == NSURLErrorTimedOut {
+                                                                self.present_alert("Server is not responding. Please, try again later.")
+                                                            }
+                                                            else if error2?._code == NSURLErrorCannotConnectToHost {
+                                                                self.present_alert("Server is not responding. Please, try again later.")
+                                                            }
+                                                            else if error2?._code == NSURLErrorNetworkConnectionLost {
+                                                                // make second request, if connection was lost - try again
+                                                                let taskStudentsTry = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
+                                                                    guard let data2 = data2, error2 == nil else {
+                                                                        self.present_alert("Please, try again later.")
+                                                                        print(error2?.localizedDescription ?? "No data")
+                                                                        return
+                                                                    }
+                                                                    let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                                                    if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                                        
+                                                                        if responseJSON2["status"] as? String == "ok" {
+                                                                            // id, name
+                                                                            let new_user_list = responseJSON2["users"] as? [[String]]
+                                                                            
+                                                                            var new_users = [User: Int]()
+                                                                            for each_user in new_user_list! {
+                                                                                let new_student = User(uid: Int(each_user[0])!,
+                                                                                                       name: each_user[1])
+                                                                                // make a dictionary
+                                                                                new_users[new_student!] = 1
+                                                                            }
+                                                                            
+                                                                            let old_users = self.dict_tasks[self.tasks[0]]?.keys
+                                                                            for each_old_user in old_users! {
+                                                                                if let _ = new_users[each_old_user] {
+                                                                                    continue
+                                                                                }
+                                                                                else {
+                                                                                    // delete users from main dictionary
+                                                                                    let keys_in_dict = self.dict_tasks.keys
+                                                                                    for key in keys_in_dict {
+                                                                                        let _ = self.dict_tasks[key]?.removeValue(forKey: each_old_user)
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                                        }
+                                                                        else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                                        {
+                                                                            self.logout()
+                                                                        }
+                                                                    }
+                                                                }
+                                                                taskStudentsTry.resume()
+                                                                
+                                                            }
+                                                            
+                                                            print(error2?.localizedDescription ?? "No data")
+                                                            return
+                                                        }
+                                                            // actual response
+                                                        let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                                        if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                            
+                                                            if responseJSON2["status"] as? String == "ok" {
+                                                                // id, name
+                                                                let new_user_list = responseJSON2["users"] as? [[String]]
+                                                                
+                                                                var new_users = [User: Int]()
+                                                                for each_user in new_user_list! {
+                                                                    let new_student = User(uid: Int(each_user[0])!,
+                                                                                           name: each_user[1])
+                                                                    // make a dictionary
+                                                                    new_users[new_student!] = 1
+                                                                }
+                                                                
+                                                                let old_users = self.dict_tasks[self.tasks[0]]?.keys
+                                                                for each_old_user in old_users! {
+                                                                    if let _ = new_users[each_old_user] {
+                                                                        continue
+                                                                    }
+                                                                    else {
+                                                                        // delete users from main dictionary
+                                                                        let keys_in_dict = self.dict_tasks.keys
+                                                                        for key in keys_in_dict {
+                                                                            let _ = self.dict_tasks[key]?.removeValue(forKey: each_old_user)
+                                                                        }
+                                                                    }
+                                                                }
+                                                                self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                            }
+                                                            else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                            {
+                                                                self.logout()
+                                                            }
+                                                        }
+                                                    }
+                                                    taskStudents.resume()
+                                                }
+                                            }
+                                        }
+                                        else if responseJSON["detail"] as? String == "Signature has expired."
+                                        {
+                                            self.logout()
+                                        }
+                                        else {
+                                            // Unable to remove students in a database
+                                            print(error?.localizedDescription ?? "Unable to remove students in a database")
+                                            self.present_alert("Could not add/remove students in a list, please try again.")
+                                        }
+                                    }
+                                }
+                                task_remove.resume()
+                                
+                            } else if responseJSON["detail"] as? String == "Signature has expired."
+                            {
+                                self.logout()
+                            }
+                            else {
+                                // Unable to add students in a database
+                                print(error?.localizedDescription ?? "Unable to add students in a database")
+                                self.present_alert("Could not add/remove students in a list, please try again.")
+                            }
+                        }
+                    }
+                    taskTry.resume()
+                }
                 print(error?.localizedDescription ?? "No data")
                 return
             }
+                // actual response
             let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
             if let responseJSON = responseJSON as? [String: Any] {
                 
@@ -67,9 +427,167 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     
                     let task_remove = URLSession.shared.dataTask(with: request_remove) { data, response, error in
                         guard let data = data, error == nil else {
+                            if error?._code == NSURLErrorTimedOut {
+                                self.present_alert("Server is not responding. Please, try again later.")
+                            }
+                            else if error?._code == NSURLErrorCannotConnectToHost {
+                                self.present_alert("Server is not responding. Please, try again later.")
+                            }
+                            else if error?._code == NSURLErrorNetworkConnectionLost {
+                                // make second request, if connection was lost - try again
+                                let task_removeTry = URLSession.shared.dataTask(with: request_remove) { data, response, error in
+                                    guard let data = data, error == nil else {
+                                        self.present_alert("Please, try again later.")
+                                        print(error?.localizedDescription ?? "No data")
+                                        return
+                                    }
+                                    let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                                    if let responseJSON = responseJSON as? [String: Any] {
+                                        
+                                        if responseJSON["status"] as? String == "ok" {
+                                            // for keeping Dict instance up to date with the changes
+                                            for user in list_removed {
+                                                let dict_keys = self.dict_tasks.keys
+                                                for key in dict_keys {
+                                                    let _ = self.dict_tasks[key]!.removeValue(forKey: user)
+                                                }
+                                            }
+                                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                        } else if responseJSON["status"] as? String == "not exist" {
+                                            
+                                            // if tasks do not exist - no need to execute, no students records
+                                            if self.tasks.count > 0 {
+                                                
+                                                DispatchQueue.main.async {
+                                                    
+                                                    let jsonStudents: [String: Any] = ["subject_id": sub_id, "task_name": self.tasks[0].name]
+                                                    let jsonDataStudents = try? JSONSerialization.data(withJSONObject: jsonStudents)
+                                                    // post request to get users
+                                                    let urlStudents = URL(string: "http://127.0.0.1:8000/polls/get_students/")!
+                                                    var requestStudents = URLRequest(url: urlStudents)
+                                                    requestStudents.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                                                    requestStudents.addValue("JWT \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+                                                    requestStudents.httpMethod = "POST"
+                                                    requestStudents.httpBody = jsonDataStudents
+                                                    
+                                                    let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
+                                                        guard let data2 = data2, error2 == nil else {
+                                                            if error2?._code == NSURLErrorTimedOut {
+                                                                self.present_alert("Server is not responding. Please, try again later.")
+                                                            }
+                                                            else if error2?._code == NSURLErrorCannotConnectToHost {
+                                                                self.present_alert("Server is not responding. Please, try again later.")
+                                                            }
+                                                            else if error2?._code == NSURLErrorNetworkConnectionLost {
+                                                                // make second request, if connection was lost - try again
+                                                                let taskStudentsTry = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
+                                                                    guard let data2 = data2, error2 == nil else {
+                                                                        self.present_alert("Please, try again later.")
+                                                                        print(error2?.localizedDescription ?? "No data")
+                                                                        return
+                                                                    }
+                                                                    let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                                                    if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                                        
+                                                                        if responseJSON2["status"] as? String == "ok" {
+                                                                            // id, name
+                                                                            let new_user_list = responseJSON2["users"] as? [[String]]
+                                                                            
+                                                                            var new_users = [User: Int]()
+                                                                            for each_user in new_user_list! {
+                                                                                let new_student = User(uid: Int(each_user[0])!,
+                                                                                                       name: each_user[1])
+                                                                                // make a dictionary
+                                                                                new_users[new_student!] = 1
+                                                                            }
+                                                                            
+                                                                            let old_users = self.dict_tasks[self.tasks[0]]?.keys
+                                                                            for each_old_user in old_users! {
+                                                                                if let _ = new_users[each_old_user] {
+                                                                                    continue
+                                                                                }
+                                                                                else {
+                                                                                    // delete users from main dictionary
+                                                                                    let keys_in_dict = self.dict_tasks.keys
+                                                                                    for key in keys_in_dict {
+                                                                                        let _ = self.dict_tasks[key]?.removeValue(forKey: each_old_user)
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                                        }
+                                                                        else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                                        {
+                                                                            self.logout()
+                                                                        }
+                                                                    }
+                                                                }
+                                                                taskStudentsTry.resume()
+                                                            }
+                                                            
+                                                            print(error2?.localizedDescription ?? "No data")
+                                                            return
+                                                        }
+                                                        // actual response
+                                                        let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                                        if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                            
+                                                            if responseJSON2["status"] as? String == "ok" {
+                                                                // id, name
+                                                                let new_user_list = responseJSON2["users"] as? [[String]]
+                                                                
+                                                                var new_users = [User: Int]()
+                                                                for each_user in new_user_list! {
+                                                                    let new_student = User(uid: Int(each_user[0])!,
+                                                                                           name: each_user[1])
+                                                                    // make a dictionary
+                                                                    new_users[new_student!] = 1
+                                                                }
+                                                                
+                                                                let old_users = self.dict_tasks[self.tasks[0]]?.keys
+                                                                for each_old_user in old_users! {
+                                                                    if let _ = new_users[each_old_user] {
+                                                                        continue
+                                                                    }
+                                                                    else {
+                                                                        // delete users from main dictionary
+                                                                        let keys_in_dict = self.dict_tasks.keys
+                                                                        for key in keys_in_dict {
+                                                                            let _ = self.dict_tasks[key]?.removeValue(forKey: each_old_user)
+                                                                        }
+                                                                    }
+                                                                }
+                                                                self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                            }
+                                                            else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                            {
+                                                                self.logout()
+                                                            }
+                                                        }
+                                                    }
+                                                    taskStudents.resume()
+                                                }
+                                            }
+                                        }
+                                        else if responseJSON["detail"] as? String == "Signature has expired."
+                                        {
+                                            self.logout()
+                                        }
+                                        else {
+                                            // Unable to remove students in a database
+                                            print(error?.localizedDescription ?? "Unable to remove students in a database")
+                                            self.present_alert("Could not add/remove students in a list, please try again.")
+                                        }
+                                    }
+                                }
+                                task_removeTry.resume()
+                                
+                            }
                             print(error?.localizedDescription ?? "No data")
                             return
                         }
+                        
+                        // actual response
                         let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                         if let responseJSON = responseJSON as? [String: Any] {
                             
@@ -101,9 +619,63 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                         
                                         let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                             guard let data2 = data2, error2 == nil else {
+                                                if error2?._code == NSURLErrorTimedOut {
+                                                    self.present_alert("Server is not responding. Please, try again later.")
+                                                }
+                                                else if error2?._code == NSURLErrorCannotConnectToHost {
+                                                    self.present_alert("Server is not responding. Please, try again later.")
+                                                }
+                                                else if error2?._code == NSURLErrorNetworkConnectionLost {
+                                                    // make second request, if connection was lost - try again
+                                                    let taskStudentsTry = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
+                                                        guard let data2 = data2, error2 == nil else {
+                                                            self.present_alert("Please, try again later.")
+                                                            print(error2?.localizedDescription ?? "No data")
+                                                            return
+                                                        }
+                                                        let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                                        if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                            
+                                                            if responseJSON2["status"] as? String == "ok" {
+                                                                // id, name
+                                                                let new_user_list = responseJSON2["users"] as? [[String]]
+                                                                
+                                                                var new_users = [User: Int]()
+                                                                for each_user in new_user_list! {
+                                                                    let new_student = User(uid: Int(each_user[0])!,
+                                                                                           name: each_user[1])
+                                                                    // make a dictionary
+                                                                    new_users[new_student!] = 1
+                                                                }
+                                                                
+                                                                let old_users = self.dict_tasks[self.tasks[0]]?.keys
+                                                                for each_old_user in old_users! {
+                                                                    if let _ = new_users[each_old_user] {
+                                                                        continue
+                                                                    }
+                                                                    else {
+                                                                        // delete users from main dictionary
+                                                                        let keys_in_dict = self.dict_tasks.keys
+                                                                        for key in keys_in_dict {
+                                                                            let _ = self.dict_tasks[key]?.removeValue(forKey: each_old_user)
+                                                                        }
+                                                                    }
+                                                                }
+                                                                self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                            }
+                                                            else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                            {
+                                                                self.logout()
+                                                            }
+                                                        }
+                                                    }
+                                                    taskStudentsTry.resume()
+                                                }
+                                                
                                                 print(error2?.localizedDescription ?? "No data")
                                                 return
                                             }
+                                            // actual response
                                             let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
                                             if let responseJSON2 = responseJSON2 as? [String: Any] {
                                                 
@@ -180,8 +752,6 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
     var dict_tasks = [Task: [User: Int]]()
     var raw_token: String?
     var session_tasks = [URLSessionDataTask]()
-//    var waiting = [String]()
-//    var answered = [String:Bool]()
     
     //MARK: Actions
     
@@ -203,9 +773,142 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                 
                 let task = URLSession.shared.dataTask(with: request) { data, response, error in
                     guard let data = data, error == nil else {
+                        if error?._code == NSURLErrorTimedOut {
+                            self.present_alert("Server is not responding. Please, try again later.")
+                        }
+                        else if error?._code == NSURLErrorCannotConnectToHost {
+                            self.present_alert("Server is not responding. Please, try again later.")
+                        }
+                        else if error?._code == NSURLErrorNetworkConnectionLost {
+                            // make second request, if connection was lost - try again
+                            let taskTry = URLSession.shared.dataTask(with: request) { data, response, error in
+                                guard let data = data, error == nil else {
+                                    self.present_alert("Please, try again later.")
+                                    print(error?.localizedDescription ?? "No data")
+                                    return
+                                }
+                                let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                                if let responseJSON = responseJSON as? [String: Any] {
+                                    
+                                    if responseJSON["status"] as? String == "ok" {
+                                        let task_id = responseJSON["task_id"] as? String
+                                        let id = Int(task_id!)
+                                        let student_task = Task(uid: id!, name: new_task)
+                                        
+                                        let newIndexPath = IndexPath(row: self.tasks.count, section: 0)
+                                        self.tasks.append(student_task!)
+                                        
+                                        OperationQueue.main.addOperation {
+                                            self.tableView.insertRows(at: [newIndexPath], with: .automatic)
+                                        }
+                                        
+                                        DispatchQueue.main.async {
+                                            self.dict_tasks[student_task!] = [User: Int]()
+                                            
+                                            var users_exist = false
+                                            var users_exist_in_task: Task?
+                                            for task in self.dict_tasks.keys {
+                                                if users_exist {
+                                                    break
+                                                }
+                                                for user in self.dict_tasks[task]!.keys {
+                                                    if !(user.name.isEmpty) {
+                                                        users_exist = true
+                                                        users_exist_in_task = task
+                                                        break
+                                                    }
+                                                }
+                                            }
+                                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                            if users_exist {
+                                                let json_grades: [String: Any] = ["task": new_task, "subject_id": String(self.subject!.uid), "subject": self.subject?.name as Any, "task_with_data": users_exist_in_task?.name as Any]
+                                                let jsonDataGrades = try? JSONSerialization.data(withJSONObject: json_grades)
+                                                // post request to add new grades to database
+                                                let url_grades = URL(string: "http://127.0.0.1:8000/polls/add_grades/")!
+                                                var request_grades = URLRequest(url: url_grades)
+                                                request_grades.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                                                request_grades.addValue("JWT \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+                                                request_grades.httpMethod = "POST"
+                                                request_grades.httpBody = jsonDataGrades
+                                                let task_grade = URLSession.shared.dataTask(with: request_grades) { data2, response2, error2 in
+                                                    guard let data2 = data2, error2 == nil else {
+                                                        if error2?._code == NSURLErrorTimedOut {
+                                                            self.present_alert("Server is not responding. Please, try again later.")
+                                                        }
+                                                        else if error2?._code == NSURLErrorCannotConnectToHost {
+                                                            self.present_alert("Server is not responding. Please, try again later.")
+                                                        }
+                                                        else if error2?._code == NSURLErrorNetworkConnectionLost {
+                                                            // make second request, if connection was lost - try again
+                                                            
+                                                            let task_gradeTry = URLSession.shared.dataTask(with: request_grades) { data2, response2, error2 in
+                                                                guard let data2 = data2, error2 == nil else {
+                                                                    self.present_alert("Please, try again later.")
+                                                                    print(error2?.localizedDescription ?? "No data")
+                                                                    return
+                                                                }
+                                                                let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                                                if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                                    if responseJSON2["status"] as? String == "ok" {
+                                                                        
+                                                                        // keeping students data up to date
+                                                                        self.dict_tasks[student_task!] = self.dict_tasks[users_exist_in_task!]
+                                                                        let dict_keys = self.dict_tasks[student_task!]?.keys
+                                                                        // setting grades for a new task to 0
+                                                                        for each_user in dict_keys! {
+                                                                            self.dict_tasks[student_task!]?[each_user] = 0
+                                                                        }
+                                                                        self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                                    } else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                                    {
+                                                                        self.logout()
+                                                                    }
+                                                                }
+                                                            }
+                                                            task_gradeTry.resume()
+                                                            
+                                                        }
+                                                        print(error2?.localizedDescription ?? "No data")
+                                                        return
+                                                    }
+                                                        // actual response
+                                                    let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                                    if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                        if responseJSON2["status"] as? String == "ok" {
+                                                            
+                                                            // keeping students data up to date
+                                                            self.dict_tasks[student_task!] = self.dict_tasks[users_exist_in_task!]
+                                                            let dict_keys = self.dict_tasks[student_task!]?.keys
+                                                            // setting grades for a new task to 0
+                                                            for each_user in dict_keys! {
+                                                                self.dict_tasks[student_task!]?[each_user] = 0
+                                                            }
+                                                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                        } else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                        {
+                                                            self.logout()
+                                                        }
+                                                    }
+                                                }
+                                                task_grade.resume()
+                                            }
+                                        }
+                                        
+                                    } else if responseJSON["detail"] as? String == "Signature has expired."
+                                    {
+                                        self.logout()
+                                    }
+                                    else {
+                                        self.present_alert("Could not add new assignment, please try again.")
+                                    }
+                                }
+                            }
+                            taskTry.resume()
+                        }
                         print(error?.localizedDescription ?? "No data")
                         return
                     }
+                        //actual response
                     let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                     if let responseJSON = responseJSON as? [String: Any] {
                         
@@ -251,9 +954,46 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                     request_grades.httpBody = jsonDataGrades
                                     let task_grade = URLSession.shared.dataTask(with: request_grades) { data2, response2, error2 in
                                         guard let data2 = data2, error2 == nil else {
+                                            if error2?._code == NSURLErrorTimedOut {
+                                                self.present_alert("Server is not responding. Please, try again later.")
+                                            }
+                                            else if error2?._code == NSURLErrorCannotConnectToHost {
+                                                self.present_alert("Server is not responding. Please, try again later.")
+                                            }
+                                            else if error2?._code == NSURLErrorNetworkConnectionLost {
+                                                // make second request, if connection was lost - try again
+                                                
+                                                let task_gradeTry = URLSession.shared.dataTask(with: request_grades) { data2, response2, error2 in
+                                                    guard let data2 = data2, error2 == nil else {
+                                                        self.present_alert("Please, try again later.")
+                                                        print(error2?.localizedDescription ?? "No data")
+                                                        return
+                                                    }
+                                                    let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                                    if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                        if responseJSON2["status"] as? String == "ok" {
+                                                            
+                                                            // keeping students data up to date
+                                                            self.dict_tasks[student_task!] = self.dict_tasks[users_exist_in_task!]
+                                                            let dict_keys = self.dict_tasks[student_task!]?.keys
+                                                            // setting grades for a new task to 0
+                                                            for each_user in dict_keys! {
+                                                                self.dict_tasks[student_task!]?[each_user] = 0
+                                                            }
+                                                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                        } else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                        {
+                                                            self.logout()
+                                                        }
+                                                    }
+                                                }
+                                                task_gradeTry.resume()
+                                                
+                                            }
                                             print(error2?.localizedDescription ?? "No data")
                                             return
                                         }
+                                            // actual response
                                         let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
                                         if let responseJSON2 = responseJSON2 as? [String: Any] {
                                             if responseJSON2["status"] as? String == "ok" {
@@ -327,13 +1067,58 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     
                     let task = URLSession.shared.dataTask(with: request) { data, response, error in
                         guard let data = data, error == nil else {
-                            self.tasks = old_tasks
-                            self.dict_tasks = old_dict_tasks
+                            if error?._code == NSURLErrorTimedOut {
+                                self.tasks = old_tasks
+                                self.dict_tasks = old_dict_tasks
+                                self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                self.present_alert("Server is not responding. Please, try again later.")
+                            }
+                            else if error?._code == NSURLErrorCannotConnectToHost {
+                                self.tasks = old_tasks
+                                self.dict_tasks = old_dict_tasks
+                                self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                self.present_alert("Server is not responding. Please, try again later.")
+                            }
+                            else if error?._code == NSURLErrorNetworkConnectionLost {
+                                // make second request, if connection was lost - try again
+                                let taskTry = URLSession.shared.dataTask(with: request) { data, response, error in
+                                    guard let data = data, error == nil else {
+                                        self.tasks = old_tasks
+                                        self.dict_tasks = old_dict_tasks
+                                        self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                        print(error?.localizedDescription ?? "No data")
+                                        self.present_alert("Please, try again later.")
+                                        return
+                                    }
+                                    let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                                    if let responseJSON = responseJSON as? [String: Any] {
+                                        if responseJSON["detail"] as? String == "Signature has expired."
+                                        {
+                                            self.logout()
+                                        }
+                                        else if responseJSON["status"] as? String != "ok" {
+                                            self.present_alert("Could not change task names, please try again.")
+                                            
+                                            self.tasks = old_tasks
+                                            self.dict_tasks = old_dict_tasks
+                                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                            save_error = true
+                                            self.tableView.reloadData()
+                                        }
+                                    }
+                                }
+                                self.session_tasks.append(taskTry)
+                                taskTry.resume()
+                                
+                            } else {
+                                self.tasks = old_tasks
+                                self.dict_tasks = old_dict_tasks
+                                self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                            }
                             print(error?.localizedDescription ?? "No data")
-                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
                             return
                         }
-                        
+                        // actual response
                         let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                         if let responseJSON = responseJSON as? [String: Any] {
                             if responseJSON["detail"] as? String == "Signature has expired."
@@ -391,9 +1176,160 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     
                     let task = URLSession.shared.dataTask(with: request) { data, response, error in
                         guard let data = data, error == nil else {
+                            if error?._code == NSURLErrorTimedOut {
+                                self.present_alert("Server is not responding. Please, try again later.")
+                            }
+                            else if error?._code == NSURLErrorCannotConnectToHost {
+                                self.present_alert("Server is not responding. Please, try again later.")
+                            }
+                            else if error?._code == NSURLErrorNetworkConnectionLost {
+                                // make second request, if connection was lost - try again
+                                let taskTry = URLSession.shared.dataTask(with: request) { data, response, error in
+                                    guard let data = data, error == nil else {
+                                        self.present_alert("Please, try again later.")
+                                        print(error?.localizedDescription ?? "No data")
+                                        return
+                                    }
+                                    
+                                    let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                                    if let responseJSON = responseJSON as? [String: Any] {
+                                        
+                                        if responseJSON["status"] as? String == "ok" {
+                                            
+                                            // for keeping Dict instance up to date with the changes
+                                            if let _ = self.dict_tasks[current_task!]!.removeValue(forKey: key)
+                                            {
+                                                self.dict_tasks[current_task!]![key] = new_users_grades[key]
+                                            }
+                                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                        } else if responseJSON["detail"] as? String == "Signature has expired."
+                                        {
+                                            self.logout()
+                                        }
+                                        else if responseJSON["status"] as? String == "not exist" {
+                                            // Unable to change user's grade - reload current "all users"
+                                            print(error?.localizedDescription ?? "Unable to change user's grade in a database, no user with id \(key.uid)")
+                                            
+                                            DispatchQueue.main.async {
+                                                // reload all current students
+                                                let jsonStudents: [String: Any] = ["subject_id": sub_id, "task_name": current_task!.name]
+                                                let jsonDataStudents = try? JSONSerialization.data(withJSONObject: jsonStudents)
+                                                // post request to get users
+                                                let urlStudents = URL(string: "http://127.0.0.1:8000/polls/get_students/")!
+                                                var requestStudents = URLRequest(url: urlStudents)
+                                                requestStudents.addValue("application/json", forHTTPHeaderField: "Content-Type")
+                                                requestStudents.addValue("JWT \(self.raw_token!)", forHTTPHeaderField: "Authorization")
+                                                requestStudents.httpMethod = "POST"
+                                                requestStudents.httpBody = jsonDataStudents
+                                                
+                                                
+                                                let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
+                                                    guard let data2 = data2, error2 == nil else {
+                                                        if error2?._code == NSURLErrorTimedOut {
+                                                            self.present_alert("Server is not responding. Please, try again later.")
+                                                        }
+                                                        else if error2?._code == NSURLErrorCannotConnectToHost {
+                                                            self.present_alert("Server is not responding. Please, try again later.")
+                                                        }
+                                                        else if error2?._code == NSURLErrorNetworkConnectionLost {
+                                                            // make second request, if connection was lost - try again
+                                                            let taskStudentsTry = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
+                                                                guard let data2 = data2, error2 == nil else {
+                                                                    self.present_alert("Please, try again later.")
+                                                                    print(error2?.localizedDescription ?? "No data")
+                                                                    return
+                                                                }
+                                                                let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                                                if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                                    
+                                                                    if responseJSON2["status"] as? String == "ok" {
+                                                                        // id, name
+                                                                        let new_user_list = responseJSON2["users"] as? [[String]]
+                                                                        
+                                                                        var new_users = [User: Int]()
+                                                                        for each_user in new_user_list! {
+                                                                            let new_student = User(uid: Int(each_user[0])!,
+                                                                                                   name: each_user[1])
+                                                                            // make a dictionary
+                                                                            new_users[new_student!] = 1
+                                                                        }
+                                                                        
+                                                                        let old_users = self.dict_tasks[current_task!]?.keys
+                                                                        for each_old_user in old_users! {
+                                                                            if let _ = new_users[each_old_user] {
+                                                                                continue
+                                                                            }
+                                                                            else {
+                                                                                // delete users from main dictionary
+                                                                                let keys_in_dict = self.dict_tasks.keys
+                                                                                for key in keys_in_dict {
+                                                                                    let _ = self.dict_tasks[key]?.removeValue(forKey: each_old_user)
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                        self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                                    } else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                                    {
+                                                                        self.logout()
+                                                                    }
+                                                                }
+                                                            }
+                                                            taskStudentsTry.resume()
+                                                        }
+                                                        
+                                                        print(error2?.localizedDescription ?? "No data")
+                                                        return
+                                                    }
+                                                        // actual response
+                                                    let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                                    if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                        
+                                                        if responseJSON2["status"] as? String == "ok" {
+                                                            // id, name
+                                                            let new_user_list = responseJSON2["users"] as? [[String]]
+                                                            
+                                                            var new_users = [User: Int]()
+                                                            for each_user in new_user_list! {
+                                                                let new_student = User(uid: Int(each_user[0])!,
+                                                                                       name: each_user[1])
+                                                                // make a dictionary
+                                                                new_users[new_student!] = 1
+                                                            }
+                                                            
+                                                            let old_users = self.dict_tasks[current_task!]?.keys
+                                                            for each_old_user in old_users! {
+                                                                if let _ = new_users[each_old_user] {
+                                                                    continue
+                                                                }
+                                                                else {
+                                                                    // delete users from main dictionary
+                                                                    let keys_in_dict = self.dict_tasks.keys
+                                                                    for key in keys_in_dict {
+                                                                        let _ = self.dict_tasks[key]?.removeValue(forKey: each_old_user)
+                                                                    }
+                                                                }
+                                                            }
+                                                            self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                        } else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                        {
+                                                            self.logout()
+                                                        }
+                                                    }
+                                                }
+                                                taskStudents.resume()
+                                            }
+                                            self.present_alert("Could not change student's grades, please try again.")
+                                        }
+                                    }
+                                }
+                                taskTry.resume()
+                                
+                            }
+                            
                             print(error?.localizedDescription ?? "No data")
                             return
                         }
+                            // actual response
                         let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                         if let responseJSON = responseJSON as? [String: Any] {
                             
@@ -428,9 +1364,61 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
 
                                 let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                     guard let data2 = data2, error2 == nil else {
+                                        if error2?._code == NSURLErrorTimedOut {
+                                            self.present_alert("Server is not responding. Please, try again later.")
+                                        }
+                                        else if error2?._code == NSURLErrorCannotConnectToHost {
+                                            self.present_alert("Server is not responding. Please, try again later.")
+                                        }
+                                        else if error2?._code == NSURLErrorNetworkConnectionLost {
+                                            // make second request, if connection was lost - try again
+                                            let taskStudentsTry = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
+                                                guard let data2 = data2, error2 == nil else {
+                                                    self.present_alert("Please, try again later.")
+                                                    print(error2?.localizedDescription ?? "No data")
+                                                    return
+                                                }
+                                                let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
+                                                if let responseJSON2 = responseJSON2 as? [String: Any] {
+                                                    
+                                                    if responseJSON2["status"] as? String == "ok" {
+                                                        // id, name
+                                                        let new_user_list = responseJSON2["users"] as? [[String]]
+                                                        
+                                                        var new_users = [User: Int]()
+                                                        for each_user in new_user_list! {
+                                                            let new_student = User(uid: Int(each_user[0])!,
+                                                                                   name: each_user[1])
+                                                            // make a dictionary
+                                                            new_users[new_student!] = 1
+                                                        }
+                                                        
+                                                        let old_users = self.dict_tasks[current_task!]?.keys
+                                                        for each_old_user in old_users! {
+                                                            if let _ = new_users[each_old_user] {
+                                                                continue
+                                                            }
+                                                            else {
+                                                                // delete users from main dictionary
+                                                                let keys_in_dict = self.dict_tasks.keys
+                                                                for key in keys_in_dict {
+                                                                    let _ = self.dict_tasks[key]?.removeValue(forKey: each_old_user)
+                                                                }
+                                                            }
+                                                        }
+                                                        self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                                    } else if responseJSON2["detail"] as? String == "Signature has expired."
+                                                    {
+                                                        self.logout()
+                                                    }
+                                                }
+                                            }
+                                            taskStudentsTry.resume()
+                                        }
+                                        
                                         print(error2?.localizedDescription ?? "No data")
                                         return
-                                    }
+                                    } // actual response
                                     let responseJSON2 = try? JSONSerialization.jsonObject(with: data2, options: [])
                                     if let responseJSON2 = responseJSON2 as? [String: Any] {
                                         
@@ -583,9 +1571,58 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
             
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
                 guard let data = data, error == nil else {
+                    if error?._code == NSURLErrorTimedOut {
+                        self.tasks.append(removed_task)
+                        self.dict_tasks[removed_task] = old_dict
+                        self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                        tableView.reloadData()
+                        self.present_alert("Server is not responding. Please, try again later.")
+                    }
+                    else if error?._code == NSURLErrorCannotConnectToHost {
+                        self.tasks.append(removed_task)
+                        self.dict_tasks[removed_task] = old_dict
+                        self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                        tableView.reloadData()
+                        self.present_alert("Server is not responding. Please, try again later.")
+                    }
+                    else if error?._code == NSURLErrorNetworkConnectionLost {
+                        // make second request, if connection was lost - try again
+                        let taskTry = URLSession.shared.dataTask(with: request) { data, response, error in
+                            guard let data = data, error == nil else {
+                                self.tasks.append(removed_task)
+                                self.dict_tasks[removed_task] = old_dict
+                                self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                tableView.reloadData()
+                                self.present_alert("Please, try again later.")
+                                print(error?.localizedDescription ?? "No data")
+                                return
+                            }
+                            let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                            if let responseJSON = responseJSON as? [String: Any] {
+                                if responseJSON["detail"] as? String == "Signature has expired."
+                                {
+                                    self.logout()
+                                }
+                                else if responseJSON["status"] as? String != "ok" {
+                                    self.present_alert("Could not delete '\(removed_task.name)' task, please try again.")
+                                    
+                                    self.tasks.append(removed_task)
+                                    self.dict_tasks[removed_task] = old_dict
+                                    self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                                    tableView.reloadData()
+                                }
+                            }
+                        }
+                        taskTry.resume()
+                    } else {
+                        self.tasks.append(removed_task)
+                        self.dict_tasks[removed_task] = old_dict
+                        self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
+                        tableView.reloadData()
+                    }
                     print(error?.localizedDescription ?? "No data")
                     return
-                }
+                } // actual response
                 let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                 if let responseJSON = responseJSON as? [String: Any] {
                     if responseJSON["detail"] as? String == "Signature has expired."

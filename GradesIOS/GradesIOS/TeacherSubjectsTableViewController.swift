@@ -62,9 +62,54 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                 
                 let task = URLSession.shared.dataTask(with: request) { data, response, error in
                     guard let data = data, error == nil else {
+                        if error?._code == NSURLErrorTimedOut {
+                            self.present_alert("Server is not responding. Please, try again later.")
+                        }
+                        else if error?._code == NSURLErrorCannotConnectToHost {
+                            self.present_alert("Server is not responding. Please, try again later.")
+                        }
+                        else if error?._code == NSURLErrorNetworkConnectionLost {
+                            // make second request, if connection was lost - try again
+                            
+                            let taskTry = URLSession.shared.dataTask(with: request) { dataTry, responseTry, errorTry in
+                                guard let dataTry = dataTry, errorTry == nil else {
+                                    self.present_alert("Please, try again later.")
+                                    print(errorTry?.localizedDescription ?? "No data")
+                                    return
+                                }
+                                
+                                let responseJSON = try? JSONSerialization.jsonObject(with: dataTry, options: [])
+                                if let responseJSON = responseJSON as? [String: Any] {
+                                    if responseJSON["status"] as? String == "ok" {
+                                        if let subject_id = responseJSON["subject_id"] as? String {
+                                            let id = Int(subject_id)
+                                            let new_subject = Subject(uid: id!, name: name)
+                                            
+                                            // Add a new subject.
+                                            let newIndexPath = IndexPath(row: self.subjects.count, section: 0)
+                                            self.subjects.append(new_subject!)
+                                            self.tasks[new_subject!] = [Task]()
+                                            self.dict[new_subject!] = [Task: [User: Int]]()
+                                            
+                                            OperationQueue.main.addOperation {
+                                                self.tableView.insertRows(at: [newIndexPath], with: .automatic)
+                                            }
+                                            
+                                        }
+                                    } else if responseJSON["detail"] as? String == "Signature has expired." {
+                                        self.logout()
+                                    }
+                                    else {
+                                        self.present_alert("Could not add new class, please try again.")
+                                    }
+                                }
+                            }
+                            taskTry.resume()
+                        }
                         print(error?.localizedDescription ?? "No data")
                         return
                     }
+                    // the actual response
                     let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                     if let responseJSON = responseJSON as? [String: Any] {
                         if responseJSON["status"] as? String == "ok" {
@@ -131,9 +176,67 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                     
                     let task = URLSession.shared.dataTask(with: request) { data, response, error in
                         guard let data = data, error == nil else {
+                            if error?._code == NSURLErrorTimedOut {
+                                self.subjects = old_subjects
+                                self.dict = old_dict
+                                self.tasks = old_task
+                                save_error = true
+                                self.tableView.reloadData()
+                                self.present_alert("Server is not responding. Please, try again later.")
+                            }
+                            else if error?._code == NSURLErrorCannotConnectToHost {
+                                self.subjects = old_subjects
+                                self.dict = old_dict
+                                self.tasks = old_task
+                                save_error = true
+                                self.tableView.reloadData()
+                                self.present_alert("Server is not responding. Please, try again later.")
+                            }
+                            else if error?._code == NSURLErrorNetworkConnectionLost {
+                                // make second request, if connection was lost - try again
+                                
+                                let taskTry = URLSession.shared.dataTask(with: request) { data, response, error in
+                                    guard let data = data, error == nil else {
+                                        self.subjects = old_subjects
+                                        self.dict = old_dict
+                                        self.tasks = old_task
+                                        save_error = true
+                                        self.tableView.reloadData()
+                                        self.present_alert("Please, try again later.")
+                                        print(error?.localizedDescription ?? "No data")
+                                        return
+                                    }
+                                    let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                                    if let responseJSON = responseJSON as? [String: Any] {
+                                        if responseJSON["detail"] as? String == "Signature has expired."
+                                        {
+                                            self.logout()
+                                        }
+                                        else if responseJSON["status"] as? String != "ok" {
+                                            
+                                            self.present_alert("Could not change class name, please try again.")
+                                            
+                                            self.subjects = old_subjects
+                                            self.dict = old_dict
+                                            self.tasks = old_task
+                                            save_error = true
+                                            self.tableView.reloadData()
+                                        }
+                                    }
+                                }
+                                taskTry.resume()
+                                
+                            } else {
+                                self.subjects = old_subjects
+                                self.dict = old_dict
+                                self.tasks = old_task
+                                save_error = true
+                                self.tableView.reloadData()
+                            }
                             print(error?.localizedDescription ?? "No data")
                             return
                         }
+                        // the actual response
                         let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                         if let responseJSON = responseJSON as? [String: Any] {
                             if responseJSON["detail"] as? String == "Signature has expired."
@@ -351,9 +454,61 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
             
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
                 guard let data = data, error == nil else {
+                    if error?._code == NSURLErrorTimedOut {
+                        self.subjects.append(removed_subject)
+                        self.tasks[removed_subject] = old_task
+                        self.dict[removed_subject] = old_dict
+                        tableView.reloadData()
+                        self.present_alert("Server is not responding. Please, try again later.")
+                    }
+                    else if error?._code == NSURLErrorCannotConnectToHost {
+                        self.subjects.append(removed_subject)
+                        self.tasks[removed_subject] = old_task
+                        self.dict[removed_subject] = old_dict
+                        tableView.reloadData()
+                        self.present_alert("Server is not responding. Please, try again later.")
+                    }
+                    else if error?._code == NSURLErrorNetworkConnectionLost {
+                        // make second request, if connection was lost - try again
+                        
+                        let taskTry = URLSession.shared.dataTask(with: request) { data, response, error in
+                            guard let data = data, error == nil else {
+                                self.subjects.append(removed_subject)
+                                self.tasks[removed_subject] = old_task
+                                self.dict[removed_subject] = old_dict
+                                tableView.reloadData()
+                                self.present_alert("Please, try again later.")
+                                print(error?.localizedDescription ?? "No data")
+                                return
+                            }
+                            let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
+                            if let responseJSON = responseJSON as? [String: Any] {
+                                if responseJSON["detail"] as? String == "Signature has expired."
+                                {
+                                    self.logout()
+                                }
+                                else if responseJSON["status"] as? String != "ok" {
+                                    self.present_alert("Could not delete \(removed_subject.name) subject, please try again.")
+                                    
+                                    self.subjects.append(removed_subject)
+                                    self.tasks[removed_subject] = old_task
+                                    self.dict[removed_subject] = old_dict
+                                    tableView.reloadData()
+                                }
+                            }
+                        }
+                        taskTry.resume()
+                    } else {
+                        self.subjects.append(removed_subject)
+                        self.tasks[removed_subject] = old_task
+                        self.dict[removed_subject] = old_dict
+                        tableView.reloadData()
+                    }
+                    
                     print(error?.localizedDescription ?? "No data")
                     return
                 }
+                // the actual response
                 let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
                 if let responseJSON = responseJSON as? [String: Any] {
                     if responseJSON["detail"] as? String == "Signature has expired."
