@@ -9,7 +9,7 @@
 import UIKit
 import os.log
 
-class NewTaskViewController: UIViewController {
+class NewTaskViewController: UIViewController, UITextFieldDelegate {
     
     // MARK: properties
     @IBOutlet weak var newTaskName: UITextField!
@@ -31,9 +31,15 @@ class NewTaskViewController: UIViewController {
         }
     }
     
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+        return false
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.newTaskName.delegate = self
         // Do any additional setup after loading the view.
     }
     

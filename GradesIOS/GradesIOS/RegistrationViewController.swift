@@ -9,7 +9,7 @@
 import UIKit
 import os.log
 
-class RegistrationViewController: UIViewController {
+class RegistrationViewController: UIViewController, UITextFieldDelegate {
     
     // MARK: properties
     @IBOutlet weak var usernameText: UITextField!
@@ -35,9 +35,20 @@ class RegistrationViewController: UIViewController {
             return
         }
     }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+        return false
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.usernameText.delegate = self
+        self.passwordText.delegate = self
+        self.emailText.delegate = self
+        self.firstName.delegate = self
+        self.lastName.delegate = self
 
         // Do any additional setup after loading the view.
     }

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITextFieldDelegate {
     
     // MARK: properties
     @IBOutlet weak var loginText: UITextField!
@@ -430,8 +430,16 @@ class ViewController: UIViewController {
         }
     }
     
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        self.view.endEditing(true)
+        return false
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.loginText.delegate = self
+        self.passwordText.delegate = self
         // Do any additional setup after loading the view, typically from a nib.
     }
 
