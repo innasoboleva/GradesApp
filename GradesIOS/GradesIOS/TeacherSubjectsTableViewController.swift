@@ -62,6 +62,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                 
                 let task = URLSession.shared.dataTask(with: request) { data, response, error in
                     guard let data = data, error == nil else {
+                        os_log("Request error", log: OSLog.default, type: .debug)
                         if error?._code == NSURLErrorTimedOut {
                             self.present_alert("Server is not responding. Please, try again later.")
                         }
@@ -73,6 +74,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                             
                             let taskTry = URLSession.shared.dataTask(with: request) { dataTry, responseTry, errorTry in
                                 guard let dataTry = dataTry, errorTry == nil else {
+                                    os_log("Request error", log: OSLog.default, type: .debug)
                                     self.present_alert("Please, try again later.")
                                     print(errorTry?.localizedDescription ?? "No data")
                                     return
@@ -176,6 +178,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                     
                     let task = URLSession.shared.dataTask(with: request) { data, response, error in
                         guard let data = data, error == nil else {
+                            os_log("Request error", log: OSLog.default, type: .debug)
                             if error?._code == NSURLErrorTimedOut {
                                 self.subjects = old_subjects
                                 self.dict = old_dict
@@ -204,6 +207,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                                         self.tableView.reloadData()
                                         self.present_alert("Please, try again later.")
                                         print(error?.localizedDescription ?? "No data")
+                                        os_log("Request error", log: OSLog.default, type: .debug)
                                         return
                                     }
                                     let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])
@@ -454,6 +458,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
             
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
                 guard let data = data, error == nil else {
+                    os_log("Request error", log: OSLog.default, type: .debug)
                     if error?._code == NSURLErrorTimedOut {
                         self.subjects.append(removed_subject)
                         self.tasks[removed_subject] = old_task
@@ -479,6 +484,7 @@ class TeacherSubjectsTableViewController: UITableViewController, TasksDelegate {
                                 tableView.reloadData()
                                 self.present_alert("Please, try again later.")
                                 print(error?.localizedDescription ?? "No data")
+                                os_log("Request error", log: OSLog.default, type: .debug)
                                 return
                             }
                             let responseJSON = try? JSONSerialization.jsonObject(with: data, options: [])

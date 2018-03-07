@@ -11,6 +11,5 @@ import UIKit
 protocol ReturnGrade {
     
     func getGrade (_ grade: Int, atIndex: Int)
-    
 }
 

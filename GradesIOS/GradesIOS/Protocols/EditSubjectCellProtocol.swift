@@ -11,5 +11,4 @@ import UIKit
 protocol EditSubjectCellProtocol {
     
     func changeCell (atIndex: Int, name: String)
-    
 }

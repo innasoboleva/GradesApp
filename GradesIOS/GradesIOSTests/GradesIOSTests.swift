@@ -33,4 +33,28 @@ class GradesIOSTests: XCTestCase {
         }
     }
     
+    func testTask() {
+        let task = Task(uid: 0, name: "")
+        XCTAssertEqual(task, nil)
+        let task2 = Task(uid: 1, name: "Inna")
+        let task3 = Task(uid: 2, name: "Inna")
+        XCTAssertEqual(task2, task3)
+    }
+    
+    func testSubject() {
+        let subject = Subject(uid: 0, name: "")
+        XCTAssertEqual(subject, nil)
+        let subject2 = Subject(uid: 1, name: "Inna")
+        let subject3 = Subject(uid: 2, name: "Inna")
+        XCTAssertEqual(subject2, subject3)
+    }
+    
+    func testUser() {
+        let user = User(uid: 0, name: "")
+        XCTAssertEqual(user, nil)
+        let user2 = User(uid: 1, name: "Inna")
+        let user3 = User(uid: 2, name: "Inna")
+        XCTAssertEqual(user2, user3)
+    }
+    
 }

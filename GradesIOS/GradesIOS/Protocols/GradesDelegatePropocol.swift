@@ -9,5 +9,4 @@
 protocol DelegateGrades {
     
     func delegateGrades (_ grades: [Int])
-    
 }

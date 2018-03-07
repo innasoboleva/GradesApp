@@ -11,6 +11,5 @@ import UIKit
 protocol TasksDelegate {
     
     func tasksChanged (_ newTasks: [Task: [User: Int]], tasks: [Task], atSubject: Subject)
-    
 }
 

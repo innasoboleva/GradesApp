@@ -12,5 +12,4 @@ protocol AddRemoveStudents {
     
     func addStudent (index: Int)
     func deleteStudent (index: Int)
-    
 }

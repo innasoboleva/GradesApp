@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import os.log
 
 class ViewController: UIViewController, UITextFieldDelegate {
     
@@ -41,6 +42,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
             
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
                 guard let data = data, error == nil else {
+                    os_log("Request error", log: OSLog.default, type: .debug)
                     if error?._code == NSURLErrorTimedOut {
                         self.present_alert("Server is not responding. Please, try again later.")
                     }
@@ -52,6 +54,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
                         
                         let taskTry = URLSession.shared.dataTask(with: request) { dataTry, responseTry, errorTry in
                             guard let dataTry = dataTry, errorTry == nil else {
+                                os_log("Request error", log: OSLog.default, type: .debug)
                                 self.present_alert("Please, try again later.")
                                 print(errorTry?.localizedDescription ?? "No data")
                                 return
@@ -150,6 +153,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
+                os_log("Request error", log: OSLog.default, type: .debug)
                 if error?._code == NSURLErrorTimedOut {
                     self.present_alert("Server is not responding. Please, try again later.")
                 }
@@ -161,7 +165,8 @@ class ViewController: UIViewController, UITextFieldDelegate {
                     
                     let taskTry = URLSession.shared.dataTask(with: request) { dataTry, responseTry, errorTry in
                         guard let dataTry = dataTry, errorTry == nil else {
-                                self.present_alert("Please, try again later.")
+                            os_log("Request error", log: OSLog.default, type: .debug)
+                            self.present_alert("Please, try again later.")
                             print(errorTry?.localizedDescription ?? "No data")
                             return
                         }
@@ -180,6 +185,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
                                 
                                 let task2 = URLSession.shared.dataTask(with: request2) { data2, response2, error2 in
                                     guard let data2 = data2, error2 == nil else {
+                                        os_log("Request error", log: OSLog.default, type: .debug)
                                         print(error2?.localizedDescription ?? "No data")
                                         return
                                     }
@@ -268,6 +274,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
 
                 let task2 = URLSession.shared.dataTask(with: request2) { data2, response2, error2 in
                     guard let data2 = data2, error2 == nil else {
+                        os_log("Request error", log: OSLog.default, type: .debug)
                         if error2?._code == NSURLErrorTimedOut {
                             self.present_alert("Server is not responding. Please, try again later.")
                         }
@@ -279,6 +286,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
                             
                             let taskTry = URLSession.shared.dataTask(with: request2) { dataTry, responseTry, errorTry in
                                 guard let dataTry = dataTry, errorTry == nil else {
+                                    os_log("Request error", log: OSLog.default, type: .debug)
                                     self.present_alert("Please, try again later.")
                                     print(errorTry?.localizedDescription ?? "No data")
                                     return

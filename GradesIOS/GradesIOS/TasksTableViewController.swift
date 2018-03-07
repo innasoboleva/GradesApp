@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import os.log
 
 class TasksTableViewController: UITableViewController, StudentsChanged {
     // protocol StudentsChanged
@@ -38,6 +39,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
+                os_log("Request error", log: OSLog.default, type: .debug)
                 if error?._code == NSURLErrorTimedOut {
                     self.present_alert("Server is not responding. Please, try again later.")
                 }
@@ -48,6 +50,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     // make second request, if connection was lost - try again
                     let taskTry = URLSession.shared.dataTask(with: request) { data, response, error in
                         guard let data = data, error == nil else {
+                            os_log("Request error", log: OSLog.default, type: .debug)
                             self.present_alert("Please, try again later")
                             print(error?.localizedDescription ?? "No data")
                             return
@@ -79,6 +82,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                 
                                 let task_remove = URLSession.shared.dataTask(with: request_remove) { data, response, error in
                                     guard let data = data, error == nil else {
+                                        os_log("Request error", log: OSLog.default, type: .debug)
                                         if error?._code == NSURLErrorTimedOut {
                                             self.present_alert("Server is not responding. Please, try again later.")
                                         }
@@ -90,6 +94,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                             
                                             let task_removeTry = URLSession.shared.dataTask(with: request_remove) { data, response, error in
                                                 guard let data = data, error == nil else {
+                                                    os_log("Request error", log: OSLog.default, type: .debug)
                                                     self.present_alert("Please, try again later.")
                                                     print(error?.localizedDescription ?? "No data")
                                                     return
@@ -126,6 +131,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                                 
                                                                 let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                                                     guard let data2 = data2, error2 == nil else {
+                                                                        os_log("Request error", log: OSLog.default, type: .debug)
                                                                         if error2?._code == NSURLErrorTimedOut {
                                                                             self.present_alert("Server is not responding. Please, try again later.")
                                                                         }
@@ -137,6 +143,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                                             
                                                                             let taskStudentsTry = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                                                                 guard let data2 = data2, error2 == nil else {
+                                                                                    os_log("Request error", log: OSLog.default, type: .debug)
                                                                                     self.present_alert("Please, try again later")
                                                                                     print(error2?.localizedDescription ?? "No data")
                                                                                     return
@@ -273,6 +280,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                     
                                                     let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                                         guard let data2 = data2, error2 == nil else {
+                                                            os_log("Request error", log: OSLog.default, type: .debug)
                                                             if error2?._code == NSURLErrorTimedOut {
                                                                 self.present_alert("Server is not responding. Please, try again later.")
                                                             }
@@ -283,6 +291,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                                 // make second request, if connection was lost - try again
                                                                 let taskStudentsTry = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                                                     guard let data2 = data2, error2 == nil else {
+                                                                        os_log("Request error", log: OSLog.default, type: .debug)
                                                                         self.present_alert("Please, try again later.")
                                                                         print(error2?.localizedDescription ?? "No data")
                                                                         return
@@ -427,6 +436,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     
                     let task_remove = URLSession.shared.dataTask(with: request_remove) { data, response, error in
                         guard let data = data, error == nil else {
+                            os_log("Request error", log: OSLog.default, type: .debug)
                             if error?._code == NSURLErrorTimedOut {
                                 self.present_alert("Server is not responding. Please, try again later.")
                             }
@@ -437,6 +447,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                 // make second request, if connection was lost - try again
                                 let task_removeTry = URLSession.shared.dataTask(with: request_remove) { data, response, error in
                                     guard let data = data, error == nil else {
+                                        os_log("Request error", log: OSLog.default, type: .debug)
                                         self.present_alert("Please, try again later.")
                                         print(error?.localizedDescription ?? "No data")
                                         return
@@ -472,6 +483,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                     
                                                     let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                                         guard let data2 = data2, error2 == nil else {
+                                                            os_log("Request error", log: OSLog.default, type: .debug)
                                                             if error2?._code == NSURLErrorTimedOut {
                                                                 self.present_alert("Server is not responding. Please, try again later.")
                                                             }
@@ -482,6 +494,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                                 // make second request, if connection was lost - try again
                                                                 let taskStudentsTry = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                                                     guard let data2 = data2, error2 == nil else {
+                                                                        os_log("Request error", log: OSLog.default, type: .debug)
                                                                         self.present_alert("Please, try again later.")
                                                                         print(error2?.localizedDescription ?? "No data")
                                                                         return
@@ -619,6 +632,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                         
                                         let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                             guard let data2 = data2, error2 == nil else {
+                                                os_log("Request error", log: OSLog.default, type: .debug)
                                                 if error2?._code == NSURLErrorTimedOut {
                                                     self.present_alert("Server is not responding. Please, try again later.")
                                                 }
@@ -629,6 +643,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                     // make second request, if connection was lost - try again
                                                     let taskStudentsTry = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                                         guard let data2 = data2, error2 == nil else {
+                                                            os_log("Request error", log: OSLog.default, type: .debug)
                                                             self.present_alert("Please, try again later.")
                                                             print(error2?.localizedDescription ?? "No data")
                                                             return
@@ -773,6 +788,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                 
                 let task = URLSession.shared.dataTask(with: request) { data, response, error in
                     guard let data = data, error == nil else {
+                        os_log("Request error", log: OSLog.default, type: .debug)
                         if error?._code == NSURLErrorTimedOut {
                             self.present_alert("Server is not responding. Please, try again later.")
                         }
@@ -783,6 +799,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                             // make second request, if connection was lost - try again
                             let taskTry = URLSession.shared.dataTask(with: request) { data, response, error in
                                 guard let data = data, error == nil else {
+                                    os_log("Request error", log: OSLog.default, type: .debug)
                                     self.present_alert("Please, try again later.")
                                     print(error?.localizedDescription ?? "No data")
                                     return
@@ -832,6 +849,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                 request_grades.httpBody = jsonDataGrades
                                                 let task_grade = URLSession.shared.dataTask(with: request_grades) { data2, response2, error2 in
                                                     guard let data2 = data2, error2 == nil else {
+                                                        os_log("Request error", log: OSLog.default, type: .debug)
                                                         if error2?._code == NSURLErrorTimedOut {
                                                             self.present_alert("Server is not responding. Please, try again later.")
                                                         }
@@ -843,6 +861,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                             
                                                             let task_gradeTry = URLSession.shared.dataTask(with: request_grades) { data2, response2, error2 in
                                                                 guard let data2 = data2, error2 == nil else {
+                                                                    os_log("Request error", log: OSLog.default, type: .debug)
                                                                     self.present_alert("Please, try again later.")
                                                                     print(error2?.localizedDescription ?? "No data")
                                                                     return
@@ -954,6 +973,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                     request_grades.httpBody = jsonDataGrades
                                     let task_grade = URLSession.shared.dataTask(with: request_grades) { data2, response2, error2 in
                                         guard let data2 = data2, error2 == nil else {
+                                            os_log("Request error", log: OSLog.default, type: .debug)
                                             if error2?._code == NSURLErrorTimedOut {
                                                 self.present_alert("Server is not responding. Please, try again later.")
                                             }
@@ -965,6 +985,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                 
                                                 let task_gradeTry = URLSession.shared.dataTask(with: request_grades) { data2, response2, error2 in
                                                     guard let data2 = data2, error2 == nil else {
+                                                        os_log("Request error", log: OSLog.default, type: .debug)
                                                         self.present_alert("Please, try again later.")
                                                         print(error2?.localizedDescription ?? "No data")
                                                         return
@@ -1067,6 +1088,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     
                     let task = URLSession.shared.dataTask(with: request) { data, response, error in
                         guard let data = data, error == nil else {
+                            os_log("Request error", log: OSLog.default, type: .debug)
                             if error?._code == NSURLErrorTimedOut {
                                 self.tasks = old_tasks
                                 self.dict_tasks = old_dict_tasks
@@ -1087,6 +1109,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                         self.dict_tasks = old_dict_tasks
                                         self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
                                         print(error?.localizedDescription ?? "No data")
+                                        os_log("Request error", log: OSLog.default, type: .debug)
                                         self.present_alert("Please, try again later.")
                                         return
                                     }
@@ -1176,6 +1199,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                     
                     let task = URLSession.shared.dataTask(with: request) { data, response, error in
                         guard let data = data, error == nil else {
+                            os_log("Request error", log: OSLog.default, type: .debug)
                             if error?._code == NSURLErrorTimedOut {
                                 self.present_alert("Server is not responding. Please, try again later.")
                             }
@@ -1186,6 +1210,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                 // make second request, if connection was lost - try again
                                 let taskTry = URLSession.shared.dataTask(with: request) { data, response, error in
                                     guard let data = data, error == nil else {
+                                        os_log("Request error", log: OSLog.default, type: .debug)
                                         self.present_alert("Please, try again later.")
                                         print(error?.localizedDescription ?? "No data")
                                         return
@@ -1225,6 +1250,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                 
                                                 let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                                     guard let data2 = data2, error2 == nil else {
+                                                        os_log("Request error", log: OSLog.default, type: .debug)
                                                         if error2?._code == NSURLErrorTimedOut {
                                                             self.present_alert("Server is not responding. Please, try again later.")
                                                         }
@@ -1235,6 +1261,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                                             // make second request, if connection was lost - try again
                                                             let taskStudentsTry = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                                                 guard let data2 = data2, error2 == nil else {
+                                                                    os_log("Request error", log: OSLog.default, type: .debug)
                                                                     self.present_alert("Please, try again later.")
                                                                     print(error2?.localizedDescription ?? "No data")
                                                                     return
@@ -1364,6 +1391,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
 
                                 let taskStudents = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                     guard let data2 = data2, error2 == nil else {
+                                        os_log("Request error", log: OSLog.default, type: .debug)
                                         if error2?._code == NSURLErrorTimedOut {
                                             self.present_alert("Server is not responding. Please, try again later.")
                                         }
@@ -1374,6 +1402,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                             // make second request, if connection was lost - try again
                                             let taskStudentsTry = URLSession.shared.dataTask(with: requestStudents) { data2, response2, error2 in
                                                 guard let data2 = data2, error2 == nil else {
+                                                    os_log("Request error", log: OSLog.default, type: .debug)
                                                     self.present_alert("Please, try again later.")
                                                     print(error2?.localizedDescription ?? "No data")
                                                     return
@@ -1571,6 +1600,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
             
             let task = URLSession.shared.dataTask(with: request) { data, response, error in
                 guard let data = data, error == nil else {
+                    os_log("Request error", log: OSLog.default, type: .debug)
                     if error?._code == NSURLErrorTimedOut {
                         self.tasks.append(removed_task)
                         self.dict_tasks[removed_task] = old_dict
@@ -1594,6 +1624,7 @@ class TasksTableViewController: UITableViewController, StudentsChanged {
                                 self.delegate?.tasksChanged(self.dict_tasks, tasks: self.tasks, atSubject: self.subject!)
                                 tableView.reloadData()
                                 self.present_alert("Please, try again later.")
+                                os_log("Request error", log: OSLog.default, type: .debug)
                                 print(error?.localizedDescription ?? "No data")
                                 return
                             }
