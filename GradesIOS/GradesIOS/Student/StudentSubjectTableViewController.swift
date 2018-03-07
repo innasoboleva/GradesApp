@@ -18,6 +18,7 @@ class StudentSubjectTableViewController: UITableViewController {
     
     // actions
     @IBAction func logout(_ sender: Any) {
+        KeychainService.removePassword(service: "GradesIOS", account: "token")
         let story = UIStoryboard(name: "Main", bundle: nil)
         guard let nextController = story.instantiateInitialViewController() else {
             assertionFailure("Unable to load main view controller")
