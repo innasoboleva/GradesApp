@@ -145,7 +145,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         let json: [String: String] = ["password": passwordText.text!, "username": loginText.text!]
         let jsonData = try? JSONSerialization.data(withJSONObject: json)
         // post request to get info about user
-        let url = URL(string: "http://127.0.0.1:8000/polls/api-token-auth/")!
+        let url = URL(string: "http://gradesapp.isoboleva.com/polls/api-token-auth/")!
         var request = URLRequest(url: url)
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
