@@ -2,7 +2,7 @@
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 
 from django.http import JsonResponse
 import json
@@ -50,6 +50,9 @@ def create_permissions():
     )
 
 # need to obtain new token after and return to user
+@api_view(['GET', 'POST'])
+@authentication_classes([])
+@permission_classes([])
 def create_new_user(request):
     # If didn't set permissions before, run create_permissions()
     if request.method == "POST":
@@ -68,6 +71,12 @@ def create_new_user(request):
         new_user = User.objects.create_user(username=new_login, email=new_email, password=new_password)
         new_user.first_name = new_first_name
         new_user.last_name = new_last_name
+        
+        if not Permission.objects.filter(codename='can_publish_subjects').exists():
+            try:
+                create_permissions()
+            except:
+                return JsonResponse({"Creating permissions didn't work."}, status=504)
 
         if new_permissions == "true":
             permission = Permission.objects.get(codename='can_publish_subjects')
@@ -86,8 +95,8 @@ def create_new_user(request):
 
         new_user.save()
         # token
-        r = requests.post('http://127.0.0.1:8000/polls/api-token-auth/', data={'password': new_login,
-                                                                               'username': new_password})
+        r = requests.post('http://gradesapp.isoboleva.com/polls/api-token-auth/', data={'password': new_password,
+                                                                               'username': new_login})
         data = json.loads(r.text)
         token = data["token"]
 
